@@ -1,0 +1,36 @@
+:root {
+    --color-primary: #11e6c9;
+    --color-primary-hover: #4eca8c;
+
+    --color-background: #ecf4ff;
+
+    --color-text: #1D1D1D;
+    --color-text-secondary: #525252;
+
+    --color-border: #EAEAEA;
+
+    --color-error: #C11706;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: auto;
+}
+
+body {
+    margin: 0;
+    overflow-x: hidden;
+    font-family: sans-serif;
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
