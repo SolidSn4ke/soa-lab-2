@@ -14,10 +14,12 @@
  ********************************************************************************/
 package war;
 
+import jakarta.annotation.sql.DataSourceDefinition;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
+@DataSourceDefinition(name = "java:app/jdbc/LabworkDS", className = "org.postgresql.ds.PGSimpleDataSource", url = "jdbc:postgresql://localhost:5433/labworks", user = "postgres", password = "postgres")
 @ApplicationPath("")
 public class ApplicationConfig extends Application {
-    
+
 }
