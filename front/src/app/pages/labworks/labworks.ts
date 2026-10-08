@@ -54,11 +54,48 @@ export class Labworks implements OnInit {
     this.loadLabworks();
   }
 
+  public goToFirstPage(): void {
+    this.goToPage(0);
+  }
+
+  public goToLastPage(): void {
+    this.goToPage(this.totalPages - 1);
+  }
+
   public onLabworkClick(labworkId: number): void {
     console.log(`Labwork ${labworkId} clicked`);
   }
 
   public onCreateLabworkClick(): void {
     console.log('Create Labwork button clicked');
+  }
+
+  public get visiblePages(): number[] {
+    const windowSize = 5;
+
+    if (this.totalPages <= windowSize) {
+      return Array.from(
+        { length: this.totalPages },
+        (_, index) => index
+      );
+    }
+
+    let start = this.currentPage - 2;
+    let end = this.currentPage + 2;
+
+    if (start < 0) {
+      start = 0;
+      end = windowSize - 1;
+    }
+
+    if (end >= this.totalPages) {
+      end = this.totalPages - 1;
+      start = this.totalPages - windowSize;
+    }
+
+    return Array.from(
+      { length: end - start + 1 },
+      (_, index) => start + index
+    );
   }
 }
