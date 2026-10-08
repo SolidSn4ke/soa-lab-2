@@ -1,2 +1,61 @@
-<h1>Labworks</h1>
-<p>labworks works!</p>
+<section class="labwork">
+    <div class="container">
+        <h1>Labworks</h1>
+
+        <div class="labwork-actions">
+            <button class="button button--primary default-text" (click)="onCreateLabworkClick()">
+                Create Labwork
+            </button>
+        </div>
+
+        @if (isLoading) {
+        <div class="labwork-loading">
+            Loading...
+        </div>
+        } @else if (errorMessage) {
+        <div class="labwork-error">
+            {{ errorMessage }}
+        </div>
+        } @else {
+        <div class="labwork-table__wrapper default-text">
+            <table class="labwork-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (labwork of labworks; track labwork.id) {
+                    <tr (click)="onLabworkClick(labwork.id)">
+                        <td>{{ labwork.id }}</td>
+                        <td>{{ labwork.name }}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="labwork-pagination">
+            <span>
+                Page {{ currentPage + 1 }} of {{ totalPages }}
+            </span>
+
+            <div>
+                <button [disabled]="currentPage === 0" (click)="goToPage(currentPage - 1)">
+                    ←
+                </button>
+
+                <button [disabled]="currentPage >= totalPages - 1" (click)="goToPage(currentPage + 1)">
+                    →
+                </button>
+            </div>
+
+            <span>
+                {{ totalElements }} labworks
+            </span>
+        </div>
+        }
+    </div>
+</section>
