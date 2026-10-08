@@ -1,9 +1,9 @@
 :root {
     --color-primary: #2659ff;
-    --color-primary-hover: #2150eb;
+    --color-primary-hover: #1f49d3;
 
-    --color-secondary: #7cff9d;
-    --color-secondary-hover: #65cc7f;
+    --color-secondary: #65cc7f;
+    --color-secondary-hover: #4ba862;
 
     --color-background: #ecf4ff;
     --color-background-header: #b6d4ff;
@@ -11,7 +11,7 @@
     --color-surface: #f0f0f0;
     --color-surface-alternate: #f5f5f5;
 
-    --color-text: #1D1D1D;
+    --color-text-primary: #1D1D1D;
     --color-text-secondary: #525252;
     --color-text-inverse: #FFFFFF;
 
@@ -68,6 +68,11 @@ a {
             background-color: var(--color-primary-hover);
         }
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 
 section {
@@ -84,4 +89,22 @@ section {
 
 .default-text {
     font-size: clamp(14px, 2.5vw, 24px);
+}
+
+.small-text {
+    font-size: clamp(12px, 2vw, 20px);
+}
+
+.text {
+    &-primary {
+        color: var(--color-text-primary);
+    }
+
+    &-secondary {
+        color: var(--color-text-secondary);
+    }
+
+    &-inverse {
+        color: var(--color-text-inverse);
+    }
 }

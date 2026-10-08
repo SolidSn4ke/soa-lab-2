@@ -37,23 +37,35 @@
             </table>
         </div>
 
-        <div class="labwork-pagination">
-            <span>
-                Page {{ currentPage + 1 }} of {{ totalPages }}
-            </span>
+        <div class="labwork-pagination default-text">
 
-            <div>
-                <button [disabled]="currentPage === 0" (click)="goToPage(currentPage - 1)">
+            <div class="labwork-pagination__buttons">
+                <button class="button button--primary" [disabled]="currentPage === 0" (click)="goToFirstPage()">
+                    «
+                </button>
+                <button [disabled]="currentPage === 0" class="button button--primary"
+                    (click)="goToPage(currentPage - 1)">
                     ←
                 </button>
 
-                <button [disabled]="currentPage >= totalPages - 1" (click)="goToPage(currentPage + 1)">
+                @for (page of visiblePages; track page) {
+                <button class="button button--primary labwork-pagination__button" [class.active]="page === currentPage"
+                    (click)="goToPage(page)">
+                    {{ page + 1 }}
+                </button>
+                }
+
+                <button class="button button--primary" [disabled]="currentPage === totalPages - 1"
+                    (click)="goToPage(currentPage + 1)">
                     →
                 </button>
+                <button class="button button--primary" [disabled]="currentPage >= totalPages - 1"
+                    (click)="goToLastPage()">
+                    »
+                </button>
             </div>
-
             <span>
-                {{ totalElements }} labworks
+                Total: {{ totalPages }} pages
             </span>
         </div>
         }
