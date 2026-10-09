@@ -19,7 +19,7 @@ export class LabworkDetails implements OnInit {
 
     if (!Number.isInteger(id) || id <= 0) {
       console.error('Invalid labwork ID:', id);
-      return;
+      this.router.navigate(['/not-found']);
     }
 
     this.loadLabworkDetails(id);
@@ -32,6 +32,7 @@ export class LabworkDetails implements OnInit {
       },
       error: (error) => {
         console.error('Error loading labwork details:', error);
+        this.router.navigate(['/not-found']);
       }
     });
   }

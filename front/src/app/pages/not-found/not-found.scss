@@ -1,0 +1,9 @@
+.not-found {
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 70%;
+        padding-top: 80px;
+    }
+}

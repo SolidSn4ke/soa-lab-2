@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { mockLabworks } from './mock/labwork.mock';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -48,9 +48,9 @@ export class LabworkService {
             const labwork = mockLabworks.find(l => l.id === id);
             if (labwork) {
                 return of(labwork);
-            } else {
-                throw new Error(`Labwork with ID ${id} not found`);
             }
+
+            return throwError(() => new Error(`Labwork with ID ${id} not found`));
         }
 
         return this.http.get<Labwork>(`${this.apiUrl}/${id}`);
