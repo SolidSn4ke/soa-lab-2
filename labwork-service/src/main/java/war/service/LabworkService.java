@@ -1,5 +1,7 @@
 package war.service;
 
+import jakarta.data.Order;
+import jakarta.data.page.PageRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import war.mapper.LabworkMapper;
@@ -8,6 +10,7 @@ import war.model.dto.enums.Difficulty;
 import war.model.dto.labworks.CreateLabworkRequest;
 import war.model.dto.labworks.LabworkDto;
 import war.model.dto.labworks.PatchLabworkRequest;
+import war.model.entity.LabworkEntity;
 import war.model.repo.LabworkRepository;
 
 @ApplicationScoped
@@ -19,7 +22,7 @@ public class LabworkService {
     @Inject
     LabworkRepository labworkRepo;
 
-    public PageInfo<LabworkDto> getAll() {
+    public PageInfo<LabworkDto> getAll(PageRequest pageRequest, Order<LabworkEntity> order) {
         // TODO: add impl
         return null;
     }

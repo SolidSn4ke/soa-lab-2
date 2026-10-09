@@ -1,5 +1,7 @@
 package war.service;
 
+import jakarta.data.Order;
+import jakarta.data.page.PageRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import war.mapper.DisciplineMapper;
@@ -7,6 +9,7 @@ import war.model.dto.PageInfo;
 import war.model.dto.disciplines.CreateDisciplineRequest;
 import war.model.dto.disciplines.DisciplineDto;
 import war.model.dto.disciplines.PatchDisciplineRequest;
+import war.model.entity.DisciplineEntity;
 import war.model.repo.DisciplineRepository;
 
 @ApplicationScoped
@@ -18,7 +21,7 @@ public class DisciplineService {
     @Inject
     DisciplineRepository disciplineRepo;
 
-    public PageInfo<DisciplineDto> getAll() {
+    public PageInfo<DisciplineDto> getAll(PageRequest pageRequest, Order<DisciplineEntity> order) {
         // TODO: add impl
         return null;
     }
