@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Labwork } from '../../interfaces/Labwork';
 import { LabworkService } from '../../services/labwork.service';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [CommonModule],
@@ -20,7 +21,7 @@ export class Labworks implements OnInit {
   public isLoading: boolean = false;
   public errorMessage: string | null = null;
 
-  public constructor(private labworkService: LabworkService) { }
+  public constructor(private labworkService: LabworkService, private router: Router) { }
 
   public ngOnInit(): void {
     this.loadLabworks();
@@ -63,7 +64,7 @@ export class Labworks implements OnInit {
   }
 
   public onLabworkClick(labworkId: number): void {
-    console.log(`Labwork ${labworkId} clicked`);
+    this.router.navigate(['/labworks', labworkId]);
   }
 
   public onCreateLabworkClick(): void {

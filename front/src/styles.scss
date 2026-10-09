@@ -18,6 +18,8 @@
     --color-border: #dddddd;
 
     --color-error: #C11706;
+    --color-red: #ec3e3e;
+    --color-red-hover: #d33131;
 }
 
 * {
@@ -43,6 +45,10 @@ p {
     margin: 0;
 }
 
+h1 {
+    font-size: clamp(40px, 6vw, 80px);
+}
+
 button,
 input,
 textarea {
@@ -66,6 +72,15 @@ a {
 
         &:hover {
             background-color: var(--color-primary-hover);
+        }
+    }
+
+    &--red {
+        background-color: var(--color-red);
+        color: var(--color-text-inverse);
+
+        &:hover {
+            background-color: var(--color-red-hover);
         }
     }
 
