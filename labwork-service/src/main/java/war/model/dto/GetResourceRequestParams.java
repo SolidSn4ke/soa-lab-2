@@ -2,24 +2,28 @@ package war.model.dto;
 
 import java.util.List;
 
-import jakarta.data.Sort;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class GetResourceRequestParams<E> {
-    @Min(value = 0)
-    @NotNull
+public class GetResourceRequestParams {
+    @QueryParam("page")
+    @DefaultValue("0")
+    @Min(0)
     Integer page;
 
-    @NotNull
-    @Min(value = 1)
+    @QueryParam("size")
+    @DefaultValue("20")
+    @Min(1)
     Integer size;
 
-    List<Sort<E>> sort;
+    @QueryParam("sort")
+    List<String> sort;
 
+    @QueryParam("search")
     List<String> search;
 }
