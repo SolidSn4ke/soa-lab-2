@@ -2,9 +2,22 @@
     <div class="container">
         <h1>Labworks</h1>
 
-        <div class="labwork-actions">
-            <button class="button button--primary default-text" (click)="onCreateLabworkClick()">
+        <h2>Filters</h2>
+        <div class="filter-list">
+
+        </div>
+
+        <button class="button button--surface default-text" (click)="addSearch()">
+            + Add filter
+        </button>
+
+        <h2>Elements</h2>
+        <div class="labwork-actions default-text">
+            <button class="button button--primary" (click)="onCreateLabworkClick()">
                 Create Labwork
+            </button>
+            <button class="button button--red" (click)="clearSort()">
+                Clear Sort
             </button>
         </div>
 
@@ -21,8 +34,22 @@
             <table class="labwork-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
+                        <th (click)="onSortClick('id')">
+                            <span>ID</span>
+                            @if (getSort('id')){
+                            <span class="sort-arrow">
+                                {{ getSort('id') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
+                        <th (click)="onSortClick('name')">
+                            <span>Name</span>
+                            @if (getSort('name')){
+                            <span class="sort-arrow">
+                                {{ getSort('name') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
                     </tr>
                 </thead>
 
@@ -65,7 +92,10 @@
                 </button>
             </div>
             <span>
-                Total: {{ totalPages }} pages
+                Total pages: {{ totalPages }}
+            </span>
+            <span>
+                Total elements: {{ totalElements }}
             </span>
         </div>
         }

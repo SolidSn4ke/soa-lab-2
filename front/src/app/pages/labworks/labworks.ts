@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { Labwork } from '../../interfaces/Labwork';
 import { LabworkService } from '../../services/labwork.service';
 import { Router } from '@angular/router';
+import { SortItem } from '../../interfaces/SortItem';
+import { FilterItem } from '../../interfaces/FilterItem';
 
 @Component({
   imports: [CommonModule],
@@ -18,6 +20,9 @@ export class Labworks implements OnInit {
   public pageSize: number = 10;
   public totalElements: number = 0;
 
+  public sortRules: SortItem[] = [];
+  public filters: FilterItem[] = [];
+
   public isLoading: boolean = false;
   public errorMessage: string | null = null;
 
@@ -30,20 +35,30 @@ export class Labworks implements OnInit {
   public loadLabworks(): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.labworkService.getLabworks(this.currentPage, this.pageSize).subscribe({
-      next: (pageInfo) => {
-        this.labworks = pageInfo.items;
-        this.currentPage = pageInfo.page;
-        this.pageSize = pageInfo.size;
-        this.totalPages = pageInfo.totalPages;
-        this.totalElements = pageInfo.totalElements;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.errorMessage = error;
-        this.isLoading = false;
-      }
-    });
+
+    const sort = this.sortRules.map(
+      rule => `${rule.field},${rule.direction}`
+    )
+
+    const search = this.filters.map(
+      filter => `${filter.field}${filter.operator}${filter.value.trim()}`
+    );
+
+    this.labworkService.getLabworks(this.currentPage, this.pageSize, sort, search)
+      .subscribe({
+        next: (pageInfo) => {
+          this.labworks = pageInfo.items;
+          this.currentPage = pageInfo.page;
+          this.pageSize = pageInfo.size;
+          this.totalPages = pageInfo.totalPages;
+          this.totalElements = pageInfo.totalElements;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.errorMessage = error;
+          this.isLoading = false;
+        }
+      });
   }
 
   public goToPage(page: number): void {
@@ -98,5 +113,49 @@ export class Labworks implements OnInit {
       { length: end - start + 1 },
       (_, index) => start + index
     );
+  }
+
+  public addSearch(): void {
+
+  }
+
+  public onSortClick(field: string) {
+    const currentRule = this.sortRules.find(
+      rule => rule.field === field
+    );
+
+    const direction = currentRule?.direction === 'asc' ? 'desc' : 'asc';
+    if (currentRule) {
+      this.sortRules.forEach(
+        rule => {
+          if (rule === currentRule) {
+            rule.direction = direction;
+          }
+        }
+      )
+    } else {
+      this.sortRules.push({ field, direction });
+    }
+
+
+    this.currentPage = 0;
+    this.loadLabworks();
+  }
+
+  public clearSort() {
+    this.sortRules = [];
+    this.loadLabworks();
+  }
+
+  public getSort(field: string): 'asc' | 'desc' | null {
+    const currentRule = this.sortRules.find(
+      rule => rule.field === field
+    );
+
+    if (currentRule) {
+      return currentRule.direction;
+    }
+
+    return null;
   }
 }

@@ -9,6 +9,7 @@
     --color-background-header: #b6d4ff;
 
     --color-surface: #f0f0f0;
+    --color-surface-hover: #a0a0a0;
     --color-surface-alternate: #f5f5f5;
 
     --color-text-primary: #1D1D1D;
@@ -51,6 +52,12 @@ h1 {
     padding-bottom: 40px;
 }
 
+h2 {
+    font-size: clamp(30px, 4vw, 50px);
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
 button,
 input,
 textarea {
@@ -83,6 +90,16 @@ a {
 
         &:hover {
             background-color: var(--color-red-hover);
+        }
+    }
+
+    &--surface {
+        background-color: var(--color-surface);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+
+        &:hover {
+            background-color: var(--color-surface-hover);
         }
     }
 
@@ -123,5 +140,16 @@ section {
 
     &-inverse {
         color: var(--color-text-inverse);
+    }
+}
+
+.clear-sort-button {
+    padding: 6px 12px;
+}
+
+.sort-arrow {
+    &.flip {
+        transform: rotateX(180deg);
+        background-color: #1D1D1D;
     }
 }
