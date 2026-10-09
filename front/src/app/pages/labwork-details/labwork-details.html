@@ -1,1 +1,16 @@
-<p>labwork-details works!</p>
+<section>
+    <div class="container">
+        <h1>{{ labworkDetails?.name }}</h1>
+        <div class="labwork-details__info default-text">
+            <p>ID: {{ labworkDetails?.id }}</p>
+        </div>
+        <div class="labwork-details__actions">
+            <button class="button button--primary default-text labwork-details__actions--edit" (click)="onEditClick()">
+                Edit
+            </button>
+            <button class="button button--red default-text labwork-details__actions--delete" (click)="onDeleteClick()">
+                Delete
+            </button>
+        </div>
+    </div>
+</section>

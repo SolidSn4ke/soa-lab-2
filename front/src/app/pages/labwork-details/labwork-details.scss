@@ -1,0 +1,15 @@
+.labwork-details__actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 20px;
+    padding-bottom: 40px;
+
+    &--edit {
+        width: 70%;
+    }
+
+    &--delete {
+        width: 28%;
+    }
+}

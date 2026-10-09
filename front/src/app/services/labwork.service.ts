@@ -41,4 +41,33 @@ export class LabworkService {
             { params }
         );
     }
+
+    public getById(id: number): Observable<Labwork> {
+        // Mock data
+        if (environment.useMocks) {
+            const labwork = mockLabworks.find(l => l.id === id);
+            if (labwork) {
+                return of(labwork);
+            } else {
+                throw new Error(`Labwork with ID ${id} not found`);
+            }
+        }
+
+        return this.http.get<Labwork>(`${this.apiUrl}/${id}`);
+    }
+
+    public deleteLabwork(id: number): Observable<void> {
+        // Mock data
+        if (environment.useMocks) {
+            const index = mockLabworks.findIndex(l => l.id === id);
+            if (index !== -1) {
+                mockLabworks.splice(index, 1);
+                return of(undefined);
+            } else {
+                throw new Error(`Labwork with ID ${id} not found`);
+            }
+        }
+
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
 }
