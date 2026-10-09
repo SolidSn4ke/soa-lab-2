@@ -1,11 +1,5 @@
 package war.rest.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.data.Order;
-import jakarta.data.Sort;
-import jakarta.data.page.PageRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -25,7 +19,6 @@ import war.model.dto.PageInfo;
 import war.model.dto.disciplines.CreateDisciplineRequest;
 import war.model.dto.disciplines.DisciplineDto;
 import war.model.dto.disciplines.PatchDisciplineRequest;
-import war.model.entity.DisciplineEntity;
 import war.service.DisciplineService;
 
 @Path("/disciplines")
@@ -38,22 +31,7 @@ public class DisciplineController {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public PageInfo<DisciplineDto> getDisciplines(@BeanParam @Valid GetResourceRequestParams params) {
-        PageRequest pageRequest = PageRequest.ofPage(params.getPage(), params.getSize(), true);
-        List<Sort<? super DisciplineEntity>> sorts = new ArrayList<>();
-
-        params.getSort().forEach(e -> {
-            e.trim();
-            String[] parts = e.split(",");
-            if (parts.length == 2 && parts[1].toLowerCase().matches("(asc|desc)")) {
-                if (parts[1].toLowerCase().equals("asc"))
-                    sorts.add(Sort.asc(parts[0]));
-                else
-                    sorts.add(Sort.desc(parts[0]));
-            }
-        });
-
-        Order<DisciplineEntity> order = Order.<DisciplineEntity>by(sorts);
-        return disciplineService.getAll(pageRequest, order);
+        return disciplineService.getAll(params);
     }
 
     @POST

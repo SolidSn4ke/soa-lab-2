@@ -40,7 +40,7 @@ public class LabworkController {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public PageInfo<LabworkDto> getLabworks(@BeanParam @Valid GetResourceRequestParams params) {
-        PageRequest pageRequest = PageRequest.ofPage(params.getPage(), params.getSize(), true);
+        PageRequest pageRequest = PageRequest.ofPage(params.getPage() + 1, params.getSize(), true);
         List<Sort<? super LabworkEntity>> sorts = new ArrayList<>();
 
         params.getSort().forEach(e -> {

@@ -15,7 +15,7 @@ import war.model.entity.DisciplineEntity;
 public interface DisciplineMapper {
     DisciplineDto toDto(DisciplineEntity entity);
 
-    DisciplineEntity toEntity(DisciplineDto dto);
+    DisciplineEntity toEntity(CreateDisciplineRequest dto);
 
     void updateFromPut(CreateDisciplineRequest req, @MappingTarget DisciplineEntity entity);
 

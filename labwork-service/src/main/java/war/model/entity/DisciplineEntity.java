@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +19,7 @@ public class DisciplineEntity {
 
     @Column(name = "labs_count")
     private long labsCount;
+
+    @Version
+    private Long version;
 }
