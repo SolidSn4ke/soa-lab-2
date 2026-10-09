@@ -36,12 +36,12 @@ public class LabworkEntity {
     private ZonedDateTime creationDate;
 
     @Column(nullable = false, name = "minimal_point")
-    private Long minimalPoint; // Поле не может быть null, Значение поля должно быть больше 0
+    private Long minimalPoint;
 
     @Column(name = "average_point")
-    private Long averagePoint; // Поле может быть null, Значение поля должно быть больше 0
+    private Long averagePoint;
 
-    private Difficulty difficulty; // Поле может быть null
+    private Difficulty difficulty;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discipline_name", nullable = false)
