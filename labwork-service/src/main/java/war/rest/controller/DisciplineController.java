@@ -1,5 +1,7 @@
 package war.rest.controller;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
@@ -17,9 +19,15 @@ import war.model.dto.PageInfo;
 import war.model.dto.disciplines.CreateDisciplineRequest;
 import war.model.dto.disciplines.DisciplineDto;
 import war.model.dto.disciplines.PatchDisciplineRequest;
+import war.service.DisciplineService;
 
 @Path("/disciplines")
+@ApplicationScoped
 public class DisciplineController {
+
+    @Inject
+    DisciplineService disciplineService;
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public PageInfo<DisciplineDto> getDisciplines(@BeanParam @Valid GetResourceRequestParams params) {

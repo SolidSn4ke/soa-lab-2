@@ -1,5 +1,7 @@
 package war.rest.controller;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
@@ -19,9 +21,15 @@ import war.model.dto.enums.Difficulty;
 import war.model.dto.labworks.CreateLabworkRequest;
 import war.model.dto.labworks.LabworkDto;
 import war.model.dto.labworks.PatchLabworkRequest;
+import war.service.LabworkService;
 
 @Path("/labworks")
+@ApplicationScoped
 public class LabworkController {
+
+    @Inject
+    LabworkService labworkService;
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public PageInfo<LabworkDto> getLabworks(@BeanParam @Valid GetResourceRequestParams params) {
