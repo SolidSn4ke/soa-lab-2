@@ -15,7 +15,11 @@ export class LabworkService {
 
     public constructor(private readonly http: HttpClient) { }
 
-    public getLabworks(page: number, size: number): Observable<PageInfo<Labwork>> {
+    public getLabworks(
+        page: number,
+        size: number,
+        sort: string[],
+        search: string[]): Observable<PageInfo<Labwork>> {
         // Mock data
         if (environment.useMocks) {
             const start = page * size;
@@ -32,9 +36,17 @@ export class LabworkService {
         }
 
 
-        const params = new HttpParams()
+        let params = new HttpParams()
             .set('page', page)
             .set('size', size);
+
+        for (const sortItem of sort) {
+            params = params.append('sort', sortItem);
+        }
+
+        for (const searchItem of search) {
+            params = params.append('search', searchItem);
+        }
 
         return this.http.get<PageInfo<Labwork>>(
             this.apiUrl,
