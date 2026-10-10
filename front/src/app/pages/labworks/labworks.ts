@@ -5,9 +5,10 @@ import { LabworkService } from '../../services/labwork.service';
 import { Router } from '@angular/router';
 import { SortItem } from '../../interfaces/SortItem';
 import { FilterItem } from '../../interfaces/FilterItem';
+import { LabworkForm } from '../../components/labwork-form/labwork-form';
 
 @Component({
-  imports: [CommonModule],
+  imports: [CommonModule, LabworkForm],
   selector: 'app-labworks',
   styleUrl: './labworks.scss',
   templateUrl: './labworks.html',
@@ -83,7 +84,7 @@ export class Labworks implements OnInit {
   }
 
   public onCreateLabworkClick(): void {
-    console.log('Create Labwork button clicked');
+    this.isFormOpen = true;
   }
 
   public get visiblePages(): number[] {
@@ -157,5 +158,16 @@ export class Labworks implements OnInit {
     }
 
     return null;
+  }
+
+  public isFormOpen: boolean = false;
+
+  public closeForm(): void {
+    this.isFormOpen = false;
+  }
+
+  public onLabworkSaved(): void {
+    this.closeForm();
+    this.loadLabworks();
   }
 }

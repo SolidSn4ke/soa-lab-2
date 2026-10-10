@@ -1,0 +1,13 @@
+<app-modal (closed)="close()">
+    <h2>Labwork</h2>
+
+    <form>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" />
+
+        <div class="form__actions">
+            <button class="button button--primary" type="submit">Submit</button>
+            <button class="button button--red" type="button" (click)="close()">Cancel</button>
+        </div>
+    </form>
+</app-modal>
