@@ -6,9 +6,10 @@ import { Router } from '@angular/router';
 import { SortItem } from '../../interfaces/SortItem';
 import { FilterItem } from '../../interfaces/FilterItem';
 import { LabworkForm } from '../../components/labwork-form/labwork-form';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  imports: [CommonModule, LabworkForm],
+  imports: [CommonModule, LabworkForm, FormsModule],
   selector: 'app-labworks',
   styleUrl: './labworks.scss',
   templateUrl: './labworks.html',
@@ -117,7 +118,23 @@ export class Labworks implements OnInit {
   }
 
   public addSearch(): void {
+    this.filters.push({
+      field: 'name',
+      operator: '~',
+      value: '',
+    });
+  }
 
+  public removeFilter(index: number): void {
+    this.filters.splice(index, 1);
+  }
+
+  public applyFilters(): void {
+    const activeFilters = this.filters.filter(
+      filter => filter.value.trim() !== ''
+    );
+    console.log(activeFilters)
+    this.loadLabworks();
   }
 
   public onSortClick(field: string) {

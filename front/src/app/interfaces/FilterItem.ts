@@ -1,5 +1,5 @@
 export interface FilterItem {
     field: string,
-    operator: '>' | '<' | '~',
+    operator: '>' | '<' | '>=' | '<=' | '=' | '~',
     value: string,
 }
