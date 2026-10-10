@@ -146,10 +146,3 @@ section {
 .clear-sort-button {
     padding: 6px 12px;
 }
-
-.sort-arrow {
-    &.flip {
-        transform: rotateX(180deg);
-        background-color: #1D1D1D;
-    }
-}

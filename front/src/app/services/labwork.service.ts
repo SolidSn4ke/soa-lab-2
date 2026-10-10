@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PageInfo } from '../interfaces/PageInfo';
-import { Labwork } from '../interfaces/Labwork';
+import { CreateLabwork, Labwork } from '../interfaces/Labwork';
 import { Observable } from 'rxjs/internal/Observable';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -68,7 +68,7 @@ export class LabworkService {
         return this.http.get<Labwork>(`${this.apiUrl}/${id}`);
     }
 
-    public createLabwork(labwork: Labwork): Observable<Labwork> {
+    public createLabwork(labwork: CreateLabwork): Observable<Labwork> {
         // Mock data
         if (environment.useMocks) {
             const newId = mockLabworks.length > 0 ? Math.max(...mockLabworks.map(l => l.id)) + 1 : 1;
@@ -80,19 +80,19 @@ export class LabworkService {
         return this.http.post<Labwork>(this.apiUrl, labwork);
     }
 
-    public updateLabwork(labwork: Labwork): Observable<Labwork> {
+    public updateLabwork(labworkId: number, data: Labwork): Observable<Labwork> {
         // Mock data
         if (environment.useMocks) {
-            const index = mockLabworks.findIndex(l => l.id === labwork.id);
+            const index = mockLabworks.findIndex(l => l.id === labworkId);
             if (index !== -1) {
-                mockLabworks[index] = labwork;
-                return of(labwork);
+                mockLabworks[index] = data;
+                return of(data);
             } else {
-                throw new Error(`Labwork with ID ${labwork.id} not found`);
+                throw new Error(`Labwork with ID ${labworkId} not found`);
             }
         }
 
-        return this.http.patch<Labwork>(`${this.apiUrl}/${labwork.id}`, labwork);
+        return this.http.patch<Labwork>(`${this.apiUrl}/${labworkId}`, data);
     }
 
     public deleteLabwork(id: number): Observable<void> {

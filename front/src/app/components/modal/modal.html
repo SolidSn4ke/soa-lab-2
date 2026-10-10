@@ -1,0 +1,14 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal">
+    <button
+      class="modal__close"
+      type="button"
+      aria-label="Закрыть"
+      (click)="closed.emit()"
+    >
+      &times;
+    </button>
+
+    <ng-content />
+  </div>
+</div>

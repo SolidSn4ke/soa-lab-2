@@ -21,6 +21,10 @@
             </button>
         </div>
 
+        @if (isFormOpen) {
+        <app-labwork-form [labwork]="null" (saved)="onLabworkSaved()" (closed)="closeForm()" />
+        }
+
         @if (isLoading) {
         <div class="labwork-loading">
             Loading...
