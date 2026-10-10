@@ -1,13 +1,55 @@
 <app-modal (closed)="close()">
-    <h2>Labwork</h2>
+    <h2 class="form__title">
+        {{isEditMode ? 'Edit Labwork' : 'Create Labwork'}}
+    </h2>
 
-    <form>
-        <label for="name">Name</label>
-        <input id="name" name="name" type="text" />
+    <form class="default-text form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <label for="name">Name:</label>
+        <input id="name" type="text" formControlName="name" />
+
+        <div class="form-group" formGroupName="coordinates">
+            <label for="coordinates-x">X Coordinate:</label>
+            <input id="coordinates-x" type="number" formControlName="x" />
+
+            <label for="coordinates-y">Y Coordinate:</label>
+            <input id="coordinates-y" type="number" formControlName="y" />
+        </div>
+
+        <label for="minimalPoint">Minimal Point:</label>
+        <input id="minimalPoint" formControlName="minimalPoint" type="nimber" />
+
+        <label for="averagePoint">Average Point:</label>
+        <input id="averagePoint" formControlName="averagePoint" type="number" />
+
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty" formControlName="difficulty">
+            <option value="EASY">Easy</option>
+            <option value="NORMAL">Normal</option>
+            <option value="HARD">Hard</option>
+            <option value="VERY_HARD">Very Hard</option>
+            <option value="IMPOSSIBLE">Impossible</option>
+            <option value="HOPELESS">Hopeless</option>
+        </select>
+
+        <label for="disciplineId">Discipline:</label>
+        <select id="disciplineId" formControlName="disciplineId">
+            <option value="">Select Discipline</option>
+
+            @for (discipline of disciplines; track discipline.name) {
+            <option [value]="discipline.name">
+                {{ discipline.name }}
+            </option>
+            }
+        </select>
+
+        @if (errorMessage){
+        <p>{{errorMessage}}</p>
+        }
 
         <div class="form__actions">
-            <button class="button button--primary" type="submit">Submit</button>
-            <button class="button button--red" type="button" (click)="close()">Cancel</button>
+            <button class="button button--primary form__actions--submit" type="submit"
+                [disabled]="isSaving">Submit</button>
+            <button class="button button--red form__actions--cancel" type="button" (click)="close()">Cancel</button>
         </div>
     </form>
 </app-modal>
