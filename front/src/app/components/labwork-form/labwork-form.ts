@@ -38,9 +38,9 @@ export class LabworkForm implements OnChanges, OnInit {
   }
 
   public ngOnInit() {
-    this.disciplineService.getDisciplines().subscribe({
+    this.disciplineService.getDisciplines(0, 0, [], []).subscribe({
       next: (disciplines) => {
-        this.disciplines = disciplines;
+        this.disciplines = disciplines.items;
       },
       error: (error) => {
         console.error('Failed to load disciplines', error);
