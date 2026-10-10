@@ -6,12 +6,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { mockLabworks } from './mock/labwork.mock';
 import { of, throwError } from 'rxjs';
+import { Difficulty } from '../interfaces/Difficulty';
 
 @Injectable({
     providedIn: 'root'
 })
 export class LabworkService {
     private readonly apiUrl = 'https://localhost:42700/api/labworks';
+    private readonly secondService = 'https://localhost:42700/bars/discipline';
 
     public constructor(private readonly http: HttpClient) { }
 
@@ -108,5 +110,27 @@ export class LabworkService {
         }
 
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
+
+    public removeDiscipline(labwork: Labwork) {
+        const disciplineId = labwork.discipline?.name;
+
+        //Mock data
+        if (environment.useMocks) {
+            return of(undefined);
+        }
+
+        return this.http.delete<void>(`${this.secondService}/${disciplineId}/labwork/${labwork.id}/remove`);
+    }
+
+    public removeByDifficulty(difficulty: Difficulty) {
+        //Mock data
+        if (environment.useMocks) {
+            return of(undefined);
+        }
+
+        let params = new HttpParams().set('difficulty', difficulty)
+        
+        return this.http.delete<void>(`${this.apiUrl}`, { params });
     }
 }

@@ -80,4 +80,10 @@ export class DisciplineDetails {
       }
     });
   }
+
+  public onMakeHardcoreClick(): void {
+    if (this.disciplineDetails?.name) {
+      this.disciplineService.makeHardcore(this.disciplineDetails?.name);
+    }
+  }
 }

@@ -10,7 +10,7 @@ export interface Labwork {
     minimalPoint: number;
     averagePoint: number;
     difficulty: Difficulty;
-    discipline: Discipline;
+    discipline: Discipline | null;
 }
 
 export type CreateLabwork = Omit<Labwork, 'id'>;

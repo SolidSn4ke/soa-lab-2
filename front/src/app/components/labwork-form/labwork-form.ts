@@ -60,7 +60,7 @@ export class LabworkForm implements OnChanges, OnInit {
         minimalPoint: this.labwork?.minimalPoint ?? 0,
         averagePoint: this.labwork?.averagePoint ?? 0,
         difficulty: this.labwork?.difficulty ?? 'EASY',
-        disciplineId: this.labwork?.discipline.name ?? '',
+        disciplineId: this.labwork?.discipline?.name ?? '',
       });
     }
   }

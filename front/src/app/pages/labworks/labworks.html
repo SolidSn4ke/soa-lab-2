@@ -2,6 +2,23 @@
     <div class="container">
         <h1>Labworks</h1>
 
+        <h2>Funny Options</h2>
+        <div class="default-text">
+            <label for="difficulty">Difficulty:</label>
+
+            <select id="difficulty" name="difficulty" [(ngModel)]="difficulty">
+                <option [ngValue]="null">Select difficulty</option>
+                <option value="EASY">Easy</option>
+                <option value="NORMAL">Normal</option>
+                <option value="HARD">Hard</option>
+                <option value="VERY_HARD">Very Hard</option>
+                <option value="IMPOSSIBLE">Impossible</option>
+                <option value="HOPELESS">Hopeless</option>
+            </select>
+            
+            <button class="button button--secondary" (click)="onRemoveByDifficultyClick()">Remove by Difficulty</button>
+        </div>
+
         <h2>Filters</h2>
         <div class="filter-list">
             @for (filter of filters; track $index; let i = $index) {

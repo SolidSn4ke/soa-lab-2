@@ -7,6 +7,7 @@ import { SortItem } from '../../interfaces/SortItem';
 import { FilterItem } from '../../interfaces/FilterItem';
 import { LabworkForm } from '../../components/labwork-form/labwork-form';
 import { FormsModule } from '@angular/forms';
+import { Difficulty } from '../../interfaces/Difficulty';
 
 @Component({
   imports: [CommonModule, LabworkForm, FormsModule],
@@ -186,5 +187,13 @@ export class Labworks implements OnInit {
   public onLabworkSaved(): void {
     this.closeForm();
     this.loadLabworks();
+  }
+
+  public difficulty: Difficulty | null = null;
+
+  public onRemoveByDifficultyClick() {
+    if (this.difficulty) {
+      this.labworkService.removeByDifficulty(this.difficulty);
+    }
   }
 }
