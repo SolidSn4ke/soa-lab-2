@@ -11,6 +11,7 @@ import { PageInfo } from '../interfaces/PageInfo';
 })
 export class DisciplineService {
     private readonly apiUrl = 'https://localhost:42700/api/disciplines';
+    private readonly secondService = 'https://localhost:42700/bars/discipline';
 
     public constructor(private readonly http: HttpClient) { }
 
@@ -106,5 +107,13 @@ export class DisciplineService {
         }
 
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
+
+    public makeHardcore(disciplineId: string): Observable<void> {
+        if (environment.useMocks) {
+            return of(void 0);
+        }
+
+        return this.http.post<void>(`${this.secondService}/${disciplineId}/make-hardcore`, null);
     }
 }

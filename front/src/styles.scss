@@ -85,6 +85,15 @@ a {
         }
     }
 
+    &--secondary {
+        background-color: var(--color-secondary);
+        color: var(--color-text-inverse);
+
+        &:hover {
+            background-color: var(--color-secondary-hover);
+        }
+    }
+
     &--red {
         background-color: var(--color-red);
         color: var(--color-text-inverse);
@@ -319,4 +328,15 @@ label {
             width: 28%;
         }
     }
+}
+
+.funny-actions {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.funny-button {
+    width: 100%;
 }

@@ -21,7 +21,7 @@
             <span>difficulty:</span>
             <span> {{ labworkDetails?.difficulty }} </span>
             <span>discipline:</span>
-            <span> {{ labworkDetails?.discipline.name }} </span>
+            <span> {{ labworkDetails?.discipline?.name }} </span>
         </div>
         <div class="labwork-details__actions">
             <button class="button button--primary default-text labwork-details__actions--edit" (click)="onEditClick()">
@@ -30,6 +30,10 @@
             <button class="button button--red default-text labwork-details__actions--delete" (click)="onDeleteClick()">
                 Delete
             </button>
+        </div>
+
+        <div class="funny-actions default-text">
+            <button class="button button--secondary funny-button" (click)="onRemoveDisciplineClick()">Remove Discipline</button>
         </div>
     </div>
 </section>

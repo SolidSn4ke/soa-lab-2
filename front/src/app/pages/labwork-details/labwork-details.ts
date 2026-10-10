@@ -82,4 +82,10 @@ export class LabworkDetails implements OnInit {
       }
     });
   }
+
+  public onRemoveDisciplineClick(): void {
+    if (this.labworkDetails) {
+      this.labworkService.removeDiscipline(this.labworkDetails);
+    }
+  }
 }
