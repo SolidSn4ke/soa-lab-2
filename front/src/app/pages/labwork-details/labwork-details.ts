@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabworkService } from '../../services/labwork.service';
 import { Labwork } from '../../interfaces/Labwork';
+import { LabworkForm } from '../../components/labwork-form/labwork-form';
 
 @Component({
-  imports: [],
+  imports: [LabworkForm],
   selector: 'app-labwork-details',
   styleUrl: './labwork-details.scss',
   templateUrl: './labwork-details.html',
@@ -37,7 +38,23 @@ export class LabworkDetails implements OnInit {
     });
   }
 
-  public onEditClick(): void { }
+
+  public isFormOpen: boolean = false;
+
+  public closeForm(): void {
+    this.isFormOpen = false;
+  }
+
+  public onLabworkSaved(): void {
+    this.closeForm();
+    if (this.labworkDetails) {
+      this.loadLabworkDetails(this.labworkDetails?.id);
+    }
+  }
+
+  public onEditClick(): void {
+    this.isFormOpen = true;
+  }
 
   public onDeleteClick(): void {
     const confirmed = confirm('Are you sure you want to delete this labwork? This action cannot be undone.');
