@@ -22,10 +22,10 @@ export class DisciplineService {
         return this.http.get<Discipline[]>(this.apiUrl);
     }
 
-    public getById(id: number): Observable<Discipline> {
+    public getById(id: string): Observable<Discipline> {
         //Mock data
         if (environment.useMocks) {
-            const discipline = mockDisciplines.find(d => d.id === id);
+            const discipline = mockDisciplines.find(d => d.name === id);
             if (discipline) {
                 return of(discipline);
             } else {
@@ -50,22 +50,22 @@ export class DisciplineService {
     public updateDiscipline(discipline: Discipline): Observable<Discipline> {
         //Mock data
         if (environment.useMocks) {
-            const index = mockDisciplines.findIndex(d => d.id === discipline.id);
+            const index = mockDisciplines.findIndex(d => d.name === discipline.name);
             if (index !== -1) {
                 mockDisciplines[index] = discipline;
                 return of(discipline);
             } else {
-                throw new Error(`Discipline with ID ${discipline.id} not found`);
+                throw new Error(`Discipline with ID ${discipline.name} not found`);
             }
         }
 
-        return this.http.put<Discipline>(`${this.apiUrl}/${discipline.id}`, discipline);
+        return this.http.put<Discipline>(`${this.apiUrl}/${discipline.name}`, discipline);
     }
 
-    public deleteDiscipline(id: number): Observable<void> {
+    public deleteDiscipline(id: string): Observable<void> {
         //Mock data
         if (environment.useMocks) {
-            const index = mockDisciplines.findIndex(d => d.id === id);
+            const index = mockDisciplines.findIndex(d => d.name === id);
             if (index !== -1) {
                 mockDisciplines.splice(index, 1);
                 return of(void 0);

@@ -60,7 +60,8 @@ h2 {
 
 button,
 input,
-textarea {
+textarea,
+select {
     font: inherit;
 }
 
@@ -109,6 +110,14 @@ a {
     }
 }
 
+input,
+select {
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    padding: 10px 20px;
+    color: var(--color-text-secondary);
+}
+
 section {
     width: 100%;
     background: var(--color-background);
@@ -145,4 +154,41 @@ section {
 
 .clear-sort-button {
     padding: 6px 12px;
+}
+
+.form {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 20px;
+
+    &__title {
+        display: flex;
+        justify-self: center;
+    }
+
+    &__actions {
+        grid-column: 1/-1;
+        display: flex;
+        justify-content: space-between;
+        padding-top: 40px;
+
+        &--submit {
+            width: 60%;
+        }
+
+        &--cancel {
+            width: 35%;
+        }
+    }
+}
+
+.form-group {
+    grid-column: 1/-1;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 20px;
+}
+
+label {
+    text-align: right;
 }

@@ -54,6 +54,37 @@
                             </span>
                             }
                         </th>
+                        <th (click)="onSortClick('difficulty')">
+                            <span>Difficulty</span>
+                            @if (getSort('difficulty')){
+                            <span class="sort-arrow">
+                                {{ getSort('difficulty') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
+                        <th (click)="onSortClick('minimalPoint')">
+                            <span>Minimal Point</span>
+                            @if (getSort('minimalPoint')){
+                            <span class="sort-arrow">
+                                {{ getSort('minimalPoint') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
+                        <th (click)="onSortClick('averagePoint')">
+                            <span>Average Point</span>
+                            @if (getSort('averagePoint')){
+                            <span class="sort-arrow">
+                                {{ getSort('averagePoint') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
+                        <th (click)="onSortClick('discipline.name')">
+                            <span>Discipline</span>
+                            @if (getSort('discipline.name')){
+                            <span class="sort-arrow">
+                                {{ getSort('discipline.name') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
                     </tr>
                 </thead>
 
@@ -62,6 +93,10 @@
                     <tr (click)="onLabworkClick(labwork.id)">
                         <td>{{ labwork.id }}</td>
                         <td>{{ labwork.name }}</td>
+                        <td>{{labwork.difficulty}}</td>
+                        <td>{{labwork.minimalPoint}}</td>
+                        <td>{{labwork.averagePoint}}</td>
+                        <td>{{labwork.discipline.name}}</td>
                     </tr>
                     }
                 </tbody>

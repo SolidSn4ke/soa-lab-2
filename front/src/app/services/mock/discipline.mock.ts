@@ -1,7 +1,7 @@
 import { Discipline } from "../../interfaces/Discipline";
 
 export const mockDisciplines: Discipline[] = [
-    { id: 1 },
-    { id: 2 },
-    { id: 3 }
+    { name: "Mathematics", labsCount: 10 },
+    { name: "Physics", labsCount: 12 },
+    { name: "Chemistry", labsCount: 8 }
 ];

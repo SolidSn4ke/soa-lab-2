@@ -1,8 +1,10 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Modal } from '../modal/modal';
 import { Labwork } from '../../interfaces/Labwork';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LabworkService } from '../../services/labwork.service';
+import { DisciplineService } from '../../services/discipline.service';
+import { Discipline } from '../../interfaces/Discipline';
 
 @Component({
   imports: [Modal, ReactiveFormsModule],
@@ -10,7 +12,7 @@ import { LabworkService } from '../../services/labwork.service';
   styleUrl: './labwork-form.scss',
   templateUrl: './labwork-form.html',
 })
-export class LabworkForm implements OnChanges {
+export class LabworkForm implements OnChanges, OnInit {
   @Input() public labwork: Labwork | null = null;
 
   @Output() public saved = new EventEmitter<void>();
@@ -19,10 +21,30 @@ export class LabworkForm implements OnChanges {
   public isSaving: boolean = false;
   public errorMessage: string | null = null;
   public form: FormGroup;
+  public disciplines: Discipline[] = [];
 
-  public constructor(private formBuilder: FormBuilder, private labworkService: LabworkService) {
+  public constructor(private formBuilder: FormBuilder, private labworkService: LabworkService, private disciplineService: DisciplineService) {
     this.form = this.formBuilder.nonNullable.group({
       name: ['', [Validators.required]],
+      coordinates: this.formBuilder.group({
+        x: [0, [Validators.required]],
+        y: [0, [Validators.required]],
+      }),
+      minimalPoint: [0, [Validators.required]],
+      averagePoint: [0, [Validators.required]],
+      difficulty: ['EASY', [Validators.required]],
+      disciplineId: ['', [Validators.required]],
+    });
+  }
+
+  public ngOnInit() {
+    this.disciplineService.getDisciplines().subscribe({
+      next: (disciplines) => {
+        this.disciplines = disciplines;
+      },
+      error: (error) => {
+        console.error('Failed to load disciplines', error);
+      }
     });
   }
 
