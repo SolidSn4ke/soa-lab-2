@@ -52,8 +52,16 @@ export class LabworkForm implements OnChanges, OnInit {
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['labwork']) {
       this.form.reset({
-        name: this.labwork?.name ?? ''
-      })
+        name: this.labwork?.name ?? '',
+        coordinates: {
+          x: this.labwork?.coordinates.x ?? 0,
+          y: this.labwork?.coordinates.y ?? 0,
+        },
+        minimalPoint: this.labwork?.minimalPoint ?? 0,
+        averagePoint: this.labwork?.averagePoint ?? 0,
+        difficulty: this.labwork?.difficulty ?? 'EASY',
+        disciplineId: this.labwork?.discipline.name ?? '',
+      });
     }
   }
 

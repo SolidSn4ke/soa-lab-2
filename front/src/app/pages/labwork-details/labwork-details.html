@@ -1,8 +1,27 @@
 <section>
     <div class="container">
+        @if (isFormOpen){
+        <app-labwork-form [labwork]="labworkDetails" (saved)="onLabworkSaved()" (closed)="closeForm()" />
+        }
+
         <h1>{{ labworkDetails?.name }}</h1>
         <div class="labwork-details__info default-text">
-            <p>ID: {{ labworkDetails?.id }}</p>
+            <span>ID:</span>
+            <span> {{ labworkDetails?.id }} </span>
+            <span>X coordinate:</span>
+            <span> {{ labworkDetails?.coordinates.x }} </span>
+            <span>Y coordinate:</span>
+            <span> {{ labworkDetails?.coordinates.y }} </span>
+            <span>creationDate:</span>
+            <span> {{ labworkDetails?.creationDate }} </span>
+            <span>minimalPoint:</span>
+            <span> {{ labworkDetails?.minimalPoint }} </span>
+            <span>averagePoint:</span>
+            <span> {{ labworkDetails?.averagePoint }} </span>
+            <span>difficulty:</span>
+            <span> {{ labworkDetails?.difficulty }} </span>
+            <span>discipline:</span>
+            <span> {{ labworkDetails?.discipline.name }} </span>
         </div>
         <div class="labwork-details__actions">
             <button class="button button--primary default-text labwork-details__actions--edit" (click)="onEditClick()">
