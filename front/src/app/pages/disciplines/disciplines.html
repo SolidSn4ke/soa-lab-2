@@ -1,1 +1,135 @@
-<p>disciplines works!</p>
+<section class="discipline">
+    <div class="container">
+        <h1>Disciplines</h1>
+
+        <h2>Filters</h2>
+        <div class="filter-list">
+            @for (filter of filters; track $index; let i = $index) {
+            <div class="filter-item">
+                <select [(ngModel)]="filter.field">
+                    <option value="id">Name</option>
+                    <option value="labsCount">Labs Count</option>
+                </select>
+
+                <select [(ngModel)]="filter.operator">
+                    <option value=">">Greater than</option>
+                    <option value="<">Less than</option>
+                    <option value=">=">Greater than or equal</option>
+                    <option value="<=">Less than or equal</option>
+                    <option value="=">Equals</option>
+                    <option value="~">Contains</option>
+                </select>
+
+                <input [(ngModel)]="filter.value" type="text" placeholder="Value" />
+
+                <button type="button" class="button button--red" (click)="removeFilter(i)">
+                    Remove
+                </button>
+            </div>
+            }
+        </div>
+
+        <div class="default-text filter__actions">
+            <button class="button button--surface" (click)="addSearch()">
+                + Add filter
+            </button>
+
+            <button type="button" class="button button--primary" (click)="applyFilters()">
+                Apply filters
+            </button>
+        </div>
+
+        <h2>Elements</h2>
+        <div class="labwork-actions default-text">
+            <button class="button button--primary" (click)="onCreateDisciplineClick()">
+                Create Discipline
+            </button>
+            <button class="button button--red" (click)="clearSort()">
+                Clear Sort
+            </button>
+        </div>
+
+        @if (isFormOpen) {
+        <app-discipline-form [discipline]="null" (saved)="onDisciplineSaved()" (closed)="closeForm()" />
+        }
+
+        @if (isLoading) {
+        <div class="discipline-loading">
+            Loading...
+        </div>
+        } @else if (errorMessage) {
+        <div class="discipline-error">
+            {{ errorMessage }}
+        </div>
+        } @else {
+        <div class="labwork-table__wrapper default-text">
+            <table class="labwork-table">
+                <thead>
+                    <tr>
+                        <th (click)="onSortClick('name')">
+                            <span>Name</span>
+                            @if (getSort('name')){
+                            <span class="sort-arrow">
+                                {{ getSort('name') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
+                        <th (click)="onSortClick('labsCount')">
+                            <span>Labs Count</span>
+                            @if (getSort('labsCount')){
+                            <span class="sort-arrow">
+                                {{ getSort('labsCount') === 'desc' ? '↑' : '↓' }}
+                            </span>
+                            }
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (discipline of disciplines; track discipline.name) {
+                    <tr (click)="onDisciplineClick(discipline.name)">
+                        <td>{{ discipline.name }}</td>
+                        <td>{{discipline.labsCount}}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="labwork-pagination default-text">
+
+            <div class="labwork-pagination__buttons">
+                <button class="button button--primary" [disabled]="currentPage === 0" (click)="goToFirstPage()">
+                    «
+                </button>
+                <button [disabled]="currentPage === 0" class="button button--primary"
+                    (click)="goToPage(currentPage - 1)">
+                    ←
+                </button>
+
+                @for (page of visiblePages; track page) {
+                <button class="button button--primary labwork-pagination__button" [class.active]="page === currentPage"
+                    (click)="goToPage(page)">
+                    {{ page + 1 }}
+                </button>
+                }
+
+                <button class="button button--primary" [disabled]="currentPage === totalPages - 1"
+                    (click)="goToPage(currentPage + 1)">
+                    →
+                </button>
+                <button class="button button--primary" [disabled]="currentPage >= totalPages - 1"
+                    (click)="goToLastPage()">
+                    »
+                </button>
+            </div>
+            <span>
+                Total pages: {{ totalPages }}
+            </span>
+            <span>
+                Total elements: {{ totalElements }}
+            </span>
+        </div>
+        }
+    </div>
+</section>

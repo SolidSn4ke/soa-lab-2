@@ -1,1 +1,22 @@
-<p>discipline-form works!</p>
+<app-modal (closed)="close()">
+    <h2 class="form__title">
+        {{isEditMode ? 'Edit Discipline' : 'Create Discipline'}}
+    </h2>
+
+    <form class="default-text form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <label for="name">Name:</label>
+        <input id="name" type="text" formControlName="name" />
+
+        <label for="labsCount">Labs Count:</label>
+        <input id="labsCount" formControlName="labsCount" type="number" />
+        @if (errorMessage){
+        <p>{{errorMessage}}</p>
+        }
+
+        <div class="form__actions">
+            <button class="button button--primary form__actions--submit" type="submit"
+                [disabled]="isSaving">Submit</button>
+            <button class="button button--red form__actions--cancel" type="button" (click)="close()">Cancel</button>
+        </div>
+    </form>
+</app-modal>
