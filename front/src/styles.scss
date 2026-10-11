@@ -6,6 +6,7 @@
     --color-secondary-hover: #4ba862;
 
     --color-background: #ecf4ff;
+    --color-background-alternative: #c3dcff;
     --color-background-header: #b6d4ff;
 
     --color-surface: #f0f0f0;
@@ -49,7 +50,7 @@ p {
 h1 {
     font-size: clamp(40px, 6vw, 80px);
     padding-top: 10px;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
 }
 
 h2 {
@@ -339,4 +340,12 @@ label {
 
 .funny-button {
     width: 100%;
+}
+
+.hero {
+    background-color: var(--color-surface-alternate);
+}
+
+.background-alternative {
+    background-color: var(--color-background-alternative);
 }
