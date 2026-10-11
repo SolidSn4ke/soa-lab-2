@@ -1,7 +1,11 @@
-<section class="labwork">
+<section class="hero labworks-hero">
     <div class="container">
-        <h1>Labworks</h1>
+        <h1 class="text-inverse">Labworks</h1>
+    </div>
+</section>
 
+<section>
+    <div class="container">
         <h2>Funny Options</h2>
         <div class="default-text">
             <label for="difficulty">Difficulty:</label>
@@ -10,15 +14,20 @@
                 <option [ngValue]="null">Select difficulty</option>
                 <option value="EASY">Easy</option>
                 <option value="NORMAL">Normal</option>
-                <option value="HARD">Hard</option>
                 <option value="VERY_HARD">Very Hard</option>
                 <option value="IMPOSSIBLE">Impossible</option>
                 <option value="HOPELESS">Hopeless</option>
             </select>
-            
-            <button class="button button--secondary" (click)="onRemoveByDifficultyClick()">Remove by Difficulty</button>
-        </div>
 
+            <button class="button button--secondary" (click)="onRemoveByDifficultyClick()">
+                Remove by Difficulty
+            </button>
+        </div>
+    </div>
+</section>
+
+<section class="background-alternative">
+    <div class="container">
         <h2>Filters</h2>
         <div class="filter-list">
             @for (filter of filters; track $index; let i = $index) {
@@ -59,8 +68,13 @@
                 Apply filters
             </button>
         </div>
+    </div>
+</section>
 
+<section>
+    <div class="container">
         <h2>Elements</h2>
+
         <div class="labwork-actions default-text">
             <button class="button button--primary" (click)="onCreateLabworkClick()">
                 Create Labwork
@@ -145,7 +159,7 @@
                         <td>{{labwork.difficulty}}</td>
                         <td>{{labwork.minimalPoint}}</td>
                         <td>{{labwork.averagePoint}}</td>
-                        <td>{{labwork.discipline.name}}</td>
+                        <td>{{labwork.discipline?.name}}</td>
                     </tr>
                     }
                 </tbody>
