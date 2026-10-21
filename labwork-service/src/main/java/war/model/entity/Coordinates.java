@@ -8,7 +8,7 @@ import lombok.Setter;
 @Embeddable
 @Getter
 @Setter
-public class Coordiantes {
+public class Coordinates {
 
     @Column(nullable = false)
     private Long x;

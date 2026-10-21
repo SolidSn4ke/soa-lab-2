@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import war.model.dto.disciplines.DisciplineDto;
+import war.model.dto.labworks.LabworkDto;
 
 @Getter
 @Setter
@@ -22,7 +23,7 @@ import war.model.dto.disciplines.DisciplineDto;
 @AllArgsConstructor
 @XmlRootElement(name = "PageInfo")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso(DisciplineDto.class)
+@XmlSeeAlso({ DisciplineDto.class, LabworkDto.class })
 public class PageInfo<T> {
     @XmlElementWrapper(name = "items")
     @XmlElement(name = "item")
