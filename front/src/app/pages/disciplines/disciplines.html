@@ -1,46 +1,17 @@
-<section class="discipline">
+<section class="hero">
     <div class="container">
         <h1>Disciplines</h1>
+    </div>
+</section>
 
-        <h2>Filters</h2>
-        <div class="filter-list">
-            @for (filter of filters; track $index; let i = $index) {
-            <div class="filter-item">
-                <select [(ngModel)]="filter.field">
-                    <option value="id">Name</option>
-                    <option value="labsCount">Labs Count</option>
-                </select>
+<app-filter-panel [filters]="filters" [fields]="filterFields" (filtersChange)="filters = $event"
+    (apply)="applyFilters()" />
 
-                <select [(ngModel)]="filter.operator">
-                    <option value=">">Greater than</option>
-                    <option value="<">Less than</option>
-                    <option value=">=">Greater than or equal</option>
-                    <option value="<=">Less than or equal</option>
-                    <option value="=">Equals</option>
-                    <option value="~">Contains</option>
-                </select>
-
-                <input [(ngModel)]="filter.value" type="text" placeholder="Value" />
-
-                <button type="button" class="button button--red" (click)="removeFilter(i)">
-                    Remove
-                </button>
-            </div>
-            }
-        </div>
-
-        <div class="default-text filter__actions">
-            <button class="button button--surface" (click)="addSearch()">
-                + Add filter
-            </button>
-
-            <button type="button" class="button button--primary" (click)="applyFilters()">
-                Apply filters
-            </button>
-        </div>
-
+<section>
+    <div class="container">
         <h2>Elements</h2>
-        <div class="labwork-actions default-text">
+
+        <div class="actions default-text">
             <button class="button button--primary" (click)="onCreateDisciplineClick()">
                 Create Discipline
             </button>
@@ -54,16 +25,23 @@
         }
 
         @if (isLoading) {
-        <div class="discipline-loading">
-            Loading...
+        <div class="loading">
+            <span class="loading__circle"></span>
+            <span class="loading__text small-text">
+                Loading...
+            </span>
         </div>
-        } @else if (errorMessage) {
-        <div class="discipline-error">
+        }
+
+        @else if (errorMessage) {
+        <div class="error">
             {{ errorMessage }}
         </div>
-        } @else {
-        <div class="labwork-table__wrapper default-text">
-            <table class="labwork-table">
+        }
+
+        @else {
+        <div class="table__wrapper default-text">
+            <table class="table">
                 <thead>
                     <tr>
                         <th (click)="onSortClick('name')">
@@ -96,40 +74,8 @@
             </table>
         </div>
 
-        <div class="labwork-pagination default-text">
-
-            <div class="labwork-pagination__buttons">
-                <button class="button button--primary" [disabled]="currentPage === 0" (click)="goToFirstPage()">
-                    «
-                </button>
-                <button [disabled]="currentPage === 0" class="button button--primary"
-                    (click)="goToPage(currentPage - 1)">
-                    ←
-                </button>
-
-                @for (page of visiblePages; track page) {
-                <button class="button button--primary labwork-pagination__button" [class.active]="page === currentPage"
-                    (click)="goToPage(page)">
-                    {{ page + 1 }}
-                </button>
-                }
-
-                <button class="button button--primary" [disabled]="currentPage === totalPages - 1"
-                    (click)="goToPage(currentPage + 1)">
-                    →
-                </button>
-                <button class="button button--primary" [disabled]="currentPage >= totalPages - 1"
-                    (click)="goToLastPage()">
-                    »
-                </button>
-            </div>
-            <span>
-                Total pages: {{ totalPages }}
-            </span>
-            <span>
-                Total elements: {{ totalElements }}
-            </span>
-        </div>
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [totalElements]="totalElements"
+            [visiblePages]="visiblePages" (pageChange)="goToPage($event)" />
         }
     </div>
 </section>

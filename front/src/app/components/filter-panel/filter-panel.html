@@ -1,0 +1,43 @@
+<section class="background-alternative">
+    <div class="container">
+        <h2>Filters</h2>
+
+        <div class="filter-list">
+            @for (filter of filters; track $index; let i = $index) {
+            <div class="filter-item">
+                <select [(ngModel)]="filter.field">
+                    @for (field of fields; track field.value) {
+                    <option [value]="field.value">
+                        {{ field.label }}
+                    </option>
+                    }
+                </select>
+
+                <select [(ngModel)]="filter.operator">
+                    @for (operator of operators; track operator.value) {
+                    <option [value]="operator.value">
+                        {{ operator.label }}
+                    </option>
+                    }
+                </select>
+
+                <input [(ngModel)]="filter.value" type="text" placeholder="Value" />
+
+                <button type="button" class="button button--red" (click)="removeFilter(i)">
+                    Remove
+                </button>
+            </div>
+            }
+        </div>
+
+        <div class="default-text filter__actions">
+            <button type="button" class="button button--surface" (click)="addFilter()">
+                + Add filter
+            </button>
+
+            <button type="button" class="button button--primary" (click)="applyFilters()">
+                Apply filters
+            </button>
+        </div>
+    </div>
+</section>

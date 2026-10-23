@@ -1,0 +1,22 @@
+.pagination {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
+
+    &__buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: center;
+    }
+
+    &__button {
+        &.active {
+            background-color: var(--color-secondary);
+        }
+    }
+
+}

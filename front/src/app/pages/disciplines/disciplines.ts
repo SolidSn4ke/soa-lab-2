@@ -6,9 +6,13 @@ import { Discipline } from '../../interfaces/Discipline';
 import { SortItem } from '../../interfaces/SortItem';
 import { DisciplineForm } from '../../components/discipline-form/discipline-form';
 import { Router } from '@angular/router';
+import { Pagination } from '../../components/pagination/pagination';
+import { FilterField, FilterPanel } from '../../components/filter-panel/filter-panel';
+import { getVisiblePages } from '../../utils/pagination.utils';
+import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
 
 @Component({
-  imports: [FormsModule, DisciplineForm],
+  imports: [FormsModule, DisciplineForm, Pagination, FilterPanel],
   selector: 'app-disciplines',
   styleUrl: './disciplines.scss',
   templateUrl: './disciplines.html',
@@ -24,8 +28,15 @@ export class Disciplines implements OnInit {
   public sortRules: SortItem[] = [];
   public filters: FilterItem[] = [];
 
+  public isFormOpen: boolean = false;
+
   public isLoading: boolean = false;
   public errorMessage: string | null = null;
+
+  public readonly filterFields: FilterField[] = [
+    { value: 'id', label: 'Name' },
+    { value: 'labsCount', label: 'Labs Count' },
+  ]
 
   public constructor(private disciplineService: DisciplineService, private router: Router) { }
 
@@ -37,13 +48,8 @@ export class Disciplines implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    const sort = this.sortRules.map(
-      rule => `${rule.field},${rule.direction}`
-    )
-
-    const search = this.filters.map(
-      filter => `${filter.field}${filter.operator}${filter.value.trim()}`
-    );
+    const sort = buildSortParams(this.sortRules);
+    const search = buildSearchParams(this.filters);
 
     this.disciplineService.getDisciplines(this.currentPage, this.pageSize, sort, search)
       .subscribe({
@@ -70,10 +76,6 @@ export class Disciplines implements OnInit {
     });
   }
 
-  public removeFilter(index: number): void {
-    this.filters.splice(index, 1);
-  }
-
   public applyFilters(): void {
     const activeFilters = this.filters.filter(
       filter => filter.value.trim() !== ''
@@ -87,34 +89,8 @@ export class Disciplines implements OnInit {
   }
 
   public get visiblePages(): number[] {
-    const windowSize = 5;
-
-    if (this.totalPages <= windowSize) {
-      return Array.from(
-        { length: this.totalPages },
-        (_, index) => index
-      );
-    }
-
-    let start = this.currentPage - 2;
-    let end = this.currentPage + 2;
-
-    if (start < 0) {
-      start = 0;
-      end = windowSize - 1;
-    }
-
-    if (end >= this.totalPages) {
-      end = this.totalPages - 1;
-      start = this.totalPages - windowSize;
-    }
-
-    return Array.from(
-      { length: end - start + 1 },
-      (_, index) => start + index
-    );
+    return getVisiblePages(this.currentPage, this.totalPages);
   }
-  public isFormOpen: boolean = false;
 
   public closeForm(): void {
     this.isFormOpen = false;
@@ -154,14 +130,6 @@ export class Disciplines implements OnInit {
 
     this.currentPage = page;
     this.loadDisciplines();
-  }
-
-  public goToFirstPage(): void {
-    this.goToPage(0);
-  }
-
-  public goToLastPage(): void {
-    this.goToPage(this.totalPages - 1);
   }
 
   public onSortClick(field: string) {

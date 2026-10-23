@@ -1,0 +1,25 @@
+.filter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.filter-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    select,
+    input {
+        padding: 10px;
+    }
+}
+
+.filter__actions {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 40px;
+}

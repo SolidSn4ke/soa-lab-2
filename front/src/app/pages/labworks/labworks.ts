@@ -8,9 +8,13 @@ import { FilterItem } from '../../interfaces/FilterItem';
 import { LabworkForm } from '../../components/labwork-form/labwork-form';
 import { FormsModule } from '@angular/forms';
 import { Difficulty } from '../../interfaces/Difficulty';
+import { Pagination } from '../../components/pagination/pagination';
+import { FilterField, FilterPanel } from '../../components/filter-panel/filter-panel';
+import { getVisiblePages } from '../../utils/pagination.utils';
+import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
 
 @Component({
-  imports: [CommonModule, LabworkForm, FormsModule],
+  imports: [CommonModule, LabworkForm, FormsModule, Pagination, FilterPanel],
   selector: 'app-labworks',
   styleUrl: './labworks.scss',
   templateUrl: './labworks.html',
@@ -26,8 +30,19 @@ export class Labworks implements OnInit {
   public sortRules: SortItem[] = [];
   public filters: FilterItem[] = [];
 
+  public isFormOpen: boolean = false;
+
   public isLoading: boolean = false;
   public errorMessage: string | null = null;
+
+  public readonly filterFields: FilterField[] = [
+    { value: 'id', label: 'ID' },
+    { value: 'name', label: 'Name' },
+    { value: 'difficulty', label: 'Difficulty' },
+    { value: 'minimalPoint', label: 'Minimal Point' },
+    { value: 'averagePoint', label: 'Average Point' },
+    { value: 'discipline.name', label: 'Discipline' },
+  ];
 
   public constructor(private labworkService: LabworkService, private router: Router) { }
 
@@ -39,13 +54,8 @@ export class Labworks implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    const sort = this.sortRules.map(
-      rule => `${rule.field},${rule.direction}`
-    )
-
-    const search = this.filters.map(
-      filter => `${filter.field}${filter.operator}${filter.value.trim()}`
-    );
+    const sort = buildSortParams(this.sortRules);
+    const search = buildSearchParams(this.filters);
 
     this.labworkService.getLabworks(this.currentPage, this.pageSize, sort, search)
       .subscribe({
@@ -73,14 +83,6 @@ export class Labworks implements OnInit {
     this.loadLabworks();
   }
 
-  public goToFirstPage(): void {
-    this.goToPage(0);
-  }
-
-  public goToLastPage(): void {
-    this.goToPage(this.totalPages - 1);
-  }
-
   public onLabworkClick(labworkId: number): void {
     this.router.navigate(['/labworks', labworkId]);
   }
@@ -90,32 +92,7 @@ export class Labworks implements OnInit {
   }
 
   public get visiblePages(): number[] {
-    const windowSize = 5;
-
-    if (this.totalPages <= windowSize) {
-      return Array.from(
-        { length: this.totalPages },
-        (_, index) => index
-      );
-    }
-
-    let start = this.currentPage - 2;
-    let end = this.currentPage + 2;
-
-    if (start < 0) {
-      start = 0;
-      end = windowSize - 1;
-    }
-
-    if (end >= this.totalPages) {
-      end = this.totalPages - 1;
-      start = this.totalPages - windowSize;
-    }
-
-    return Array.from(
-      { length: end - start + 1 },
-      (_, index) => start + index
-    );
+    return getVisiblePages(this.currentPage, this.totalPages);
   }
 
   public addSearch(): void {
@@ -124,10 +101,6 @@ export class Labworks implements OnInit {
       operator: '~',
       value: '',
     });
-  }
-
-  public removeFilter(index: number): void {
-    this.filters.splice(index, 1);
   }
 
   public applyFilters(): void {
@@ -178,7 +151,6 @@ export class Labworks implements OnInit {
     return null;
   }
 
-  public isFormOpen: boolean = false;
 
   public closeForm(): void {
     this.isFormOpen = false;

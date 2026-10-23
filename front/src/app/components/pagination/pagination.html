@@ -1,0 +1,32 @@
+<div class="pagination default-text">
+    <div class="pagination__buttons">
+        <button class="button button--primary" [disabled]="currentPage() === 0" (click)="goToFirstPage()">
+            «
+        </button>
+        <button [disabled]="currentPage() === 0" class="button button--primary" (click)="goToPage(currentPage() - 1)">
+            ←
+        </button>
+
+        @for (page of visiblePages(); track page) {
+        <button class="button button--primary pagination__button" [class.active]="page === currentPage()"
+            (click)="goToPage(page)">
+            {{ page + 1 }}
+        </button>
+        }
+
+        <button class="button button--primary" [disabled]="currentPage() === totalPages() - 1"
+            (click)="goToPage(currentPage() + 1)">
+            →
+        </button>
+        <button class="button button--primary" [disabled]="currentPage() >= totalPages() - 1" (click)="goToLastPage()">
+            »
+        </button>
+    </div>
+
+    <span>
+        Total pages: {{ totalPages() }}
+    </span>
+    <span>
+        Total elements: {{ totalElements() }}
+    </span>
+</div>

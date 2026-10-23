@@ -11,7 +11,6 @@
 
     --color-surface: #f0f0f0;
     --color-surface-hover: #a0a0a0;
-    --color-surface-alternate: #f5f5f5;
 
     --color-text-primary: #1D1D1D;
     --color-text-secondary: #525252;
@@ -37,7 +36,7 @@ body {
     overflow-x: hidden;
     font-family: sans-serif;
     background: var(--color-background);
-    color: var(--color-text);
+    color: var(--color-text-primary);
 }
 
 h1,
@@ -162,6 +161,10 @@ section {
     }
 }
 
+.error {
+    color: var(--color-error);
+}
+
 .clear-sort-button {
     padding: 6px 12px;
 }
@@ -203,7 +206,7 @@ label {
     text-align: right;
 }
 
-.labwork-table {
+.table {
     width: 100%;
     border-collapse: collapse;
     border: 1px solid var(--color-border);
@@ -242,68 +245,17 @@ label {
     }
 }
 
-.labwork-actions {
+.actions {
     display: flex;
     flex-direction: row;
     gap: 10px;
     padding-bottom: 40px;
 }
 
-
-
-.labwork-table__wrapper {
+.table__wrapper {
     border-radius: 15px;
     width: 100%;
     overflow-x: auto;
-}
-
-.labwork-pagination {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    padding-top: 20px;
-
-    &__buttons {
-        display: flex;
-        flex-direction: row;
-        gap: 20px;
-        align-items: center;
-    }
-
-    &__button {
-        &.active {
-            background-color: var(--color-secondary);
-        }
-    }
-
-}
-
-.filter-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.filter-item {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-
-    select,
-    input {
-        padding: 10px;
-    }
-}
-
-.filter__actions {
-    width: 60%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding-bottom: 40px;
 }
 
 .labwork-details {
@@ -343,9 +295,38 @@ label {
 }
 
 .hero {
-    background-color: var(--color-surface-alternate);
+    padding-top: clamp(10px, 2vw, 30px);
+    padding-bottom: clamp(10px, 2vw, 30px);
 }
 
 .background-alternative {
     background-color: var(--color-background-alternative);
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+
+    &__circle {
+        width: 28px;
+        height: 28px;
+        border: 3px solid var(--color-border);
+        border-top-color: var(--color-primary);
+        border-radius: 50%;
+        animation: loading-spin 0.8s linear infinite;
+        flex-shrink: 0;
+    }
+
+    &__text {
+        color: var(--color-text-secondary);
+    }
+}
+
+@keyframes loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
