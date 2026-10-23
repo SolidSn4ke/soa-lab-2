@@ -6,9 +6,8 @@ import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
+import war.exception.HttpStatusException;
 import war.mapper.DisciplineMapper;
 import war.model.dto.GetResourceRequestParams;
 import war.model.dto.PageInfo;
@@ -45,14 +44,16 @@ public class DisciplineService {
     }
 
     public DisciplineDto getById(String id) {
-        DisciplineEntity discipline = disciplineRepo.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
+        DisciplineEntity discipline = disciplineRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", id))));
         return mapper.toDto(discipline);
     }
 
     @Transactional
     public DisciplineDto create(CreateDisciplineRequest req) {
         if (disciplineRepo.findById(req.getName()).isPresent()) {
-            throw new WebApplicationException("Conflict", Status.CONFLICT);
+            throw new HttpStatusException(Status.CONFLICT, List.of("Discipline '%s' already exists", req.getName()));
         }
 
         DisciplineEntity discipline = mapper.toEntity(req);
@@ -62,7 +63,9 @@ public class DisciplineService {
 
     @Transactional
     public DisciplineDto update(String id, CreateDisciplineRequest req) {
-        DisciplineEntity discipline = disciplineRepo.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
+        DisciplineEntity discipline = disciplineRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", id))));
 
         if (discipline.getName().equals(req.getName())) {
             mapper.updateFromPut(req, discipline);
@@ -71,7 +74,7 @@ public class DisciplineService {
         }
 
         if (disciplineRepo.findById((req.getName())).isPresent()) {
-            throw new WebApplicationException("Conflict", Status.CONFLICT);
+            throw new HttpStatusException(Status.CONFLICT, List.of("Discipline '%s' already exists", req.getName()));
         }
 
         // TODO: change disciplineId in labworks
@@ -83,7 +86,9 @@ public class DisciplineService {
 
     @Transactional
     public DisciplineDto partialUpdate(String id, PatchDisciplineRequest req) {
-        DisciplineEntity discipline = disciplineRepo.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
+        DisciplineEntity discipline = disciplineRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", id))));
 
         if (req.getName() == null || discipline.getName().equals(req.getName())) {
             mapper.updateFromPatch(req, discipline);
@@ -92,7 +97,7 @@ public class DisciplineService {
         }
 
         if (disciplineRepo.findById((req.getName())).isPresent()) {
-            throw new WebApplicationException("Conflict", Status.CONFLICT);
+            throw new HttpStatusException(Status.CONFLICT, List.of("Discipline '%s' already exists", req.getName()));
         }
 
         // TODO: change disciplineId in labworks
@@ -107,7 +112,9 @@ public class DisciplineService {
 
     @Transactional
     public void delete(String id) {
-        disciplineRepo.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
+        disciplineRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", id))));
         disciplineRepo.deleteById(id);
     }
 }

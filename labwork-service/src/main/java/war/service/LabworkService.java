@@ -7,7 +7,8 @@ import jakarta.data.Limit;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response.Status;
+import war.exception.HttpStatusException;
 import war.mapper.LabworkMapper;
 import war.model.dto.GetResourceRequestParams;
 import war.model.dto.PageInfo;
@@ -52,14 +53,17 @@ public class LabworkService {
     }
 
     public LabworkDto getById(Integer id) {
-        LabworkEntity entity = labworkRepo.findById(id).orElseThrow(() -> new NotFoundException("Not Found"));
+        LabworkEntity entity = labworkRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Labwork with id '%s' was not found", id))));
         return mapper.toDto(entity);
     }
 
     @Transactional
     public LabworkDto create(CreateLabworkRequest req) {
         DisciplineEntity discipline = disciplineRepo.findById(req.getDisciplineId())
-                .orElseThrow(() -> new NotFoundException("Not Found"));
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", req.getDisciplineId()))));
         LabworkEntity entity = mapper.toEntity(req);
         entity.setCreationDate(ZonedDateTime.now());
         entity.setDiscipline(discipline);
@@ -69,9 +73,12 @@ public class LabworkService {
 
     @Transactional
     public LabworkDto update(Integer id, CreateLabworkRequest req) {
-        LabworkEntity entity = labworkRepo.findById(id).orElseThrow(() -> new NotFoundException("Not Found"));
+        LabworkEntity entity = labworkRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Labwork with id '%s' was not found", id))));
         DisciplineEntity discipline = disciplineRepo.findById(req.getDisciplineId())
-                .orElseThrow(() -> new NotFoundException("Not Found"));
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", req.getDisciplineId()))));
 
         mapper.updateFromPut(req, entity);
         entity.setDiscipline(discipline);
@@ -81,7 +88,9 @@ public class LabworkService {
 
     @Transactional
     public LabworkDto partialUpdate(Integer id, PatchLabworkRequest req) {
-        LabworkEntity entity = labworkRepo.findById(id).orElseThrow(() -> new NotFoundException("Not Found"));
+        LabworkEntity entity = labworkRepo.findById(id)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Labwork with id '%s' was not found", id))));
         mapper.updateFromPatch(req, entity);
         entity = labworkRepo.update(entity);
         return mapper.toDto(entity);
