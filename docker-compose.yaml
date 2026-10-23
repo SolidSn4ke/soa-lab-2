@@ -15,7 +15,13 @@ services:
       context: ./labwork-service
     image: labwork-service:local
     ports:
-      - 8080:8080
+      - 42700:8443
+    volumes:
+      - type: bind
+        source: ./docker/wildfly/configuration
+        target: /opt/jboss/wildfly/standalone/configuration
+        bind:
+          create_host_path: false
     depends_on:
       pg:
         condition: service_healthy
