@@ -7,13 +7,14 @@ import { environment } from '../../environments/environment';
 import { mockLabworks } from './mock/labwork.mock';
 import { of, throwError } from 'rxjs';
 import { Difficulty } from '../interfaces/Difficulty';
+import { API_URLS } from '../constants/api.constants';
 
 @Injectable({
     providedIn: 'root'
 })
 export class LabworkService {
-    private readonly apiUrl = 'http://localhost:8080/labwork-service/labworks';
-    private readonly secondService = 'http://localhost:42700/bars/discipline';
+    private readonly labworkApiUrl = `${API_URLS.labwork}/labworks`;
+    private readonly barsApiUrl = `${API_URLS.bars}/discipline`;
 
     public constructor(private readonly http: HttpClient) { }
 
@@ -51,7 +52,7 @@ export class LabworkService {
         }
 
         return this.http.get<PageInfo<Labwork>>(
-            this.apiUrl,
+            this.labworkApiUrl,
             { params }
         );
     }
@@ -67,7 +68,7 @@ export class LabworkService {
             return throwError(() => new Error(`Labwork with ID ${id} not found`));
         }
 
-        return this.http.get<Labwork>(`${this.apiUrl}/${id}`);
+        return this.http.get<Labwork>(`${this.labworkApiUrl}/${id}`);
     }
 
     public createLabwork(labwork: CreateLabwork): Observable<Labwork> {
@@ -79,7 +80,7 @@ export class LabworkService {
             return of(newLabwork);
         }
 
-        return this.http.post<Labwork>(this.apiUrl, labwork);
+        return this.http.post<Labwork>(this.labworkApiUrl, labwork);
     }
 
     public updateLabwork(labworkId: number, data: Labwork): Observable<Labwork> {
@@ -94,7 +95,7 @@ export class LabworkService {
             }
         }
 
-        return this.http.patch<Labwork>(`${this.apiUrl}/${labworkId}`, data);
+        return this.http.patch<Labwork>(`${this.labworkApiUrl}/${labworkId}`, data);
     }
 
     public deleteLabwork(id: number): Observable<void> {
@@ -109,7 +110,7 @@ export class LabworkService {
             }
         }
 
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+        return this.http.delete<void>(`${this.labworkApiUrl}/${id}`);
     }
 
     public removeDiscipline(labwork: Labwork) {
@@ -120,7 +121,7 @@ export class LabworkService {
             return of(undefined);
         }
 
-        return this.http.delete<void>(`${this.secondService}/${disciplineId}/labwork/${labwork.id}/remove`);
+        return this.http.delete<void>(`${this.barsApiUrl}/${disciplineId}/labwork/${labwork.id}/remove`);
     }
 
     public removeByDifficulty(difficulty: Difficulty) {
@@ -130,7 +131,7 @@ export class LabworkService {
         }
 
         let params = new HttpParams().set('difficulty', difficulty)
-        
-        return this.http.delete<void>(`${this.apiUrl}`, { params });
+
+        return this.http.delete<void>(`${this.labworkApiUrl}`, { params });
     }
 }

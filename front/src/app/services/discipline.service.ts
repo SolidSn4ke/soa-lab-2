@@ -5,13 +5,14 @@ import { mockDisciplines } from './mock/discipline.mock';
 import { Observable, of } from 'rxjs';
 import { Discipline } from '../interfaces/Discipline';
 import { PageInfo } from '../interfaces/PageInfo';
+import { API_URLS } from '../constants/api.constants';
 
 @Injectable({
     providedIn: 'root'
 })
 export class DisciplineService {
-    private readonly apiUrl = 'http://localhost:8080/labwork-service//disciplines';
-    private readonly secondService = 'https://localhost:42700/bars/discipline';
+    private readonly labworkApiUrl = `${API_URLS.labwork}/disciplines`;
+    private readonly barsApiUrl = `${API_URLS.bars}/discipline`;
 
     public constructor(private readonly http: HttpClient) { }
 
@@ -49,7 +50,7 @@ export class DisciplineService {
         }
 
         return this.http.get<PageInfo<Discipline>>(
-            this.apiUrl,
+            this.labworkApiUrl,
             { params }
         );
     }
@@ -65,7 +66,7 @@ export class DisciplineService {
             }
         }
 
-        return this.http.get<Discipline>(`${this.apiUrl}/${id}`);
+        return this.http.get<Discipline>(`${this.labworkApiUrl}/${id}`);
     }
 
     public createDiscipline(discipline: Discipline): Observable<Discipline> {
@@ -76,7 +77,7 @@ export class DisciplineService {
             return of(newDiscipline);
         }
 
-        return this.http.post<Discipline>(this.apiUrl, discipline);
+        return this.http.post<Discipline>(this.labworkApiUrl, discipline);
     }
 
     public updateDiscipline(disciplineId: string, data: Discipline): Observable<Discipline> {
@@ -91,7 +92,7 @@ export class DisciplineService {
             }
         }
 
-        return this.http.put<Discipline>(`${this.apiUrl}/${disciplineId}`, data);
+        return this.http.put<Discipline>(`${this.labworkApiUrl}/${disciplineId}`, data);
     }
 
     public deleteDiscipline(id: string): Observable<void> {
@@ -106,7 +107,7 @@ export class DisciplineService {
             }
         }
 
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+        return this.http.delete<void>(`${this.labworkApiUrl}/${id}`);
     }
 
     public makeHardcore(disciplineId: string): Observable<void> {
@@ -114,6 +115,6 @@ export class DisciplineService {
             return of(void 0);
         }
 
-        return this.http.post<void>(`${this.secondService}/${disciplineId}/make-hardcore`, null);
+        return this.http.post<void>(`${this.barsApiUrl}/${disciplineId}/make-hardcore`, null);
     }
 }
