@@ -12,8 +12,8 @@ import { Difficulty } from '../interfaces/Difficulty';
     providedIn: 'root'
 })
 export class LabworkService {
-    private readonly apiUrl = 'https://localhost:42700/api/labworks';
-    private readonly secondService = 'https://localhost:42700/bars/discipline';
+    private readonly apiUrl = 'http://localhost:8080/labwork-service/labworks';
+    private readonly secondService = 'http://localhost:42700/bars/discipline';
 
     public constructor(private readonly http: HttpClient) { }
 

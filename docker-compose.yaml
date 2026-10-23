@@ -1,6 +1,15 @@
 name: soa-lab
 
 services:
+  front:
+    build:
+      context: ./front
+    image: front:local
+    ports:
+      - 4200:80
+    depends_on:
+      - labwork-service
+
   labwork-service:
     build:
       context: ./labwork-service

@@ -10,7 +10,7 @@ import { PageInfo } from '../interfaces/PageInfo';
     providedIn: 'root'
 })
 export class DisciplineService {
-    private readonly apiUrl = 'https://localhost:42700/api/disciplines';
+    private readonly apiUrl = 'http://localhost:8080/labwork-service//disciplines';
     private readonly secondService = 'https://localhost:42700/bars/discipline';
 
     public constructor(private readonly http: HttpClient) { }
