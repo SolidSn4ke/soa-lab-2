@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -51,4 +52,7 @@ public class LabworkEntity {
     @JoinColumn(name = "discipline_name", nullable = false)
     @ToString.Exclude
     private DisciplineEntity discipline;
+
+    @Version
+    private Long version;
 }

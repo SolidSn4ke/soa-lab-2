@@ -17,6 +17,7 @@ import war.model.dto.disciplines.PatchDisciplineRequest;
 import war.model.entity.DisciplineEntity;
 import war.model.repo.DisciplineQueryRepository;
 import war.model.repo.DisciplineRepository;
+import war.model.repo.LabworkRepository;
 
 @ApplicationScoped
 public class DisciplineService {
@@ -26,6 +27,9 @@ public class DisciplineService {
 
     @Inject
     DisciplineRepository disciplineRepo;
+
+    @Inject
+    LabworkRepository labworkRepo;
 
     @EJB
     DisciplineQueryRepository disciplineQueryRepo;
@@ -53,7 +57,8 @@ public class DisciplineService {
     @Transactional
     public DisciplineDto create(CreateDisciplineRequest req) {
         if (disciplineRepo.findById(req.getName()).isPresent()) {
-            throw new HttpStatusException(Status.CONFLICT, List.of("Discipline '%s' already exists", req.getName()));
+            throw new HttpStatusException(Status.CONFLICT, List.of(
+                    String.format("Discipline '%s' already exists", req.getName())));
         }
 
         DisciplineEntity discipline = mapper.toEntity(req);
@@ -74,14 +79,12 @@ public class DisciplineService {
         }
 
         if (disciplineRepo.findById((req.getName())).isPresent()) {
-            throw new HttpStatusException(Status.CONFLICT, List.of("Discipline '%s' already exists", req.getName()));
+            throw new HttpStatusException(Status.CONFLICT,
+                    List.of(String.format("Discipline '%s' already exists", req.getName())));
         }
 
-        // TODO: change disciplineId in labworks
         DisciplineEntity newDiscipline = mapper.toEntity(req);
-        newDiscipline = disciplineRepo.save(newDiscipline);
-        disciplineRepo.delete(discipline);
-        return mapper.toDto(newDiscipline);
+        return mapper.toDto(renameDiscipline(discipline, newDiscipline));
     }
 
     @Transactional
@@ -97,17 +100,22 @@ public class DisciplineService {
         }
 
         if (disciplineRepo.findById((req.getName())).isPresent()) {
-            throw new HttpStatusException(Status.CONFLICT, List.of("Discipline '%s' already exists", req.getName()));
+            throw new HttpStatusException(Status.CONFLICT,
+                    List.of(String.format("Discipline '%s' already exists", req.getName())));
         }
 
-        // TODO: change disciplineId in labworks
         DisciplineEntity newDiscipline = new DisciplineEntity();
         newDiscipline.setName(req.getName());
         newDiscipline.setLabsCount(req.getLabsCount() != null ? req.getLabsCount() : discipline.getLabsCount());
 
+        return mapper.toDto(renameDiscipline(discipline, newDiscipline));
+    }
+
+    private DisciplineEntity renameDiscipline(DisciplineEntity discipline, DisciplineEntity newDiscipline) {
         newDiscipline = disciplineRepo.save(newDiscipline);
+        labworkRepo.reassignDiscipline(discipline.getName(), newDiscipline);
         disciplineRepo.delete(discipline);
-        return mapper.toDto(newDiscipline);
+        return newDiscipline;
     }
 
     @Transactional

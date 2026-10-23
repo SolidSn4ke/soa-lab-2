@@ -17,16 +17,19 @@ public interface LabworkMapper {
     LabworkDto toDto(LabworkEntity entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "discipline", ignore = true)
     LabworkEntity toEntity(CreateLabworkRequest dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "discipline", ignore = true)
     void updateFromPut(CreateLabworkRequest req, @MappingTarget LabworkEntity entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "discipline", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
