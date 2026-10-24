@@ -111,10 +111,11 @@ export class Labworks implements OnInit {
   }
 
   public applyFilters(): void {
-    const activeFilters = this.filters.filter(
+    this.filters = this.filters.filter(
       filter => filter.value.trim() !== ''
     );
-    console.log(activeFilters)
+
+    this.currentPage = 0;
     this.loadLabworks();
   }
 

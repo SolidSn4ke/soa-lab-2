@@ -35,7 +35,7 @@ export class Disciplines implements OnInit {
   public errorMessage: string | null = null;
 
   public readonly filterFields: FilterField[] = [
-    { value: 'id', label: 'Name' },
+    { value: 'name', label: 'Name' },
     { value: 'labsCount', label: 'Labs Count' },
   ]
 
@@ -81,10 +81,11 @@ export class Disciplines implements OnInit {
   }
 
   public applyFilters(): void {
-    const activeFilters = this.filters.filter(
+    this.filters = this.filters.filter(
       filter => filter.value.trim() !== ''
     );
-    console.log(activeFilters)
+
+    this.currentPage = 0;
     this.loadDisciplines();
   }
 

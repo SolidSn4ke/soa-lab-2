@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FilterItem } from '../../interfaces/FilterItem';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 export interface FilterField {
   value: string;
@@ -8,7 +9,7 @@ export interface FilterField {
 }
 
 @Component({
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   selector: 'app-filter-panel',
   styleUrl: './filter-panel.scss',
   templateUrl: './filter-panel.html',
@@ -22,9 +23,9 @@ export class FilterPanel {
 
   public readonly operators = [
     { value: '>', label: 'Greater than' },
-    { value: '*<*', label: 'Less than' },
+    { value: '<', label: 'Less than' },
     { value: '>=', label: 'Greater than or equal' },
-    { value: '*<*=', label: 'Less than or equal' },
+    { value: '<=', label: 'Less than or equal' },
     { value: '=', label: 'Equals' },
     { value: '~', label: 'Contains' },
   ];
