@@ -24,52 +24,52 @@
         <app-discipline-form [discipline]="null" (saved)="onDisciplineSaved()" (closed)="closeForm()" />
         }
 
-        @if (isLoading()) {
-        <div class="loading">
-            <span class="loading__circle"></span>
-            <span class="loading__text small-text">
-                Loading...
-            </span>
+        <div class="table-container" [class.table-container--loading]="isLoading()">
+            @if (isLoading()) {
+            <div class="loading">
+                <span class="loading__circle"></span>
+                <span class="loading__text small-text">
+                    Loading...
+                </span>
+            </div>
+            }
+
+            <div class="table__wrapper default-text">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th (click)="onSortClick('name')">
+                                <span>Name</span>
+                                @if (getSort('name')){
+                                <span class="sort-arrow">
+                                    {{ getSort('name') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('labsCount')">
+                                <span>Labs Count</span>
+                                @if (getSort('labsCount')){
+                                <span class="sort-arrow">
+                                    {{ getSort('labsCount') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (discipline of disciplines; track discipline.name) {
+                        <tr (click)="onDisciplineClick(discipline.name)">
+                            <td>{{ discipline.name }}</td>
+                            <td>{{discipline.labsCount}}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [totalElements]="totalElements"
+                [visiblePages]="visiblePages" (pageChange)="goToPage($event)" />
         </div>
-        }
-
-        @else {
-        <div class="table__wrapper default-text">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th (click)="onSortClick('name')">
-                            <span>Name</span>
-                            @if (getSort('name')){
-                            <span class="sort-arrow">
-                                {{ getSort('name') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('labsCount')">
-                            <span>Labs Count</span>
-                            @if (getSort('labsCount')){
-                            <span class="sort-arrow">
-                                {{ getSort('labsCount') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @for (discipline of disciplines; track discipline.name) {
-                    <tr (click)="onDisciplineClick(discipline.name)">
-                        <td>{{ discipline.name }}</td>
-                        <td>{{discipline.labsCount}}</td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [totalElements]="totalElements"
-            [visiblePages]="visiblePages" (pageChange)="goToPage($event)" />
-        }
     </div>
 </section>

@@ -1,4 +1,6 @@
 <div class="pagination default-text">
+
+    @if (totalPages() > 0){
     <div class="pagination__buttons">
         <button class="button button--primary" [disabled]="currentPage() === 0" (click)="goToFirstPage()">
             «
@@ -22,6 +24,7 @@
             »
         </button>
     </div>
+    }
 
     <span>
         Total pages: {{ totalPages() }}
