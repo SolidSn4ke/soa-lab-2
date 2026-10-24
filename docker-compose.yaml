@@ -15,12 +15,19 @@ services:
       context: ./discipline-service
     image: discipline-service:local
     ports:
-      - 8081:8080
+      - 42701:8443
+    volumes:
+      - type: bind
+        source: ./docker/jetty/tls
+        target: /var/lib/jetty/tls
+        read_only: true
+        bind:
+          create_host_path: false
     environment:
       LABWORK_SERVICE_BASE_URL: http://labwork-service:8080/labwork-service
     depends_on:
       - labwork-service
-  
+
   labwork-service:
     build:
       context: ./labwork-service

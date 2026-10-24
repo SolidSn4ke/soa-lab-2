@@ -6,3 +6,4 @@
 
 # Docker
 /docker/wildfly/configuration
+/docker/jetty/tls/
