@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { mockDisciplines } from './mock/discipline.mock';
-import { map, Observable, of } from 'rxjs';
+import { EMPTY, expand, map, Observable, of, reduce } from 'rxjs';
 import { Discipline } from '../interfaces/Discipline';
 import { PageInfo } from '../interfaces/PageInfo';
 import { API_URLS } from '../constants/api.constants';
@@ -150,5 +150,20 @@ export class DisciplineService {
         }
 
         return this.http.post<void>(`${this.barsApiUrl}/${disciplineId}/make-hardcore`, null);
+    }
+
+    public getAllDisciplines(): Observable<Discipline[]> {
+        return this.getDisciplines(0, 100, [], []).pipe(
+            expand(pageInfo => {
+                const nextPage = pageInfo.page + 1;
+
+                if (nextPage >= pageInfo.totalPages) {
+                    return EMPTY;
+                }
+
+                return this.getDisciplines(nextPage, 100, [], []);
+            }),
+            reduce((all, pageInfo) => all.concat(pageInfo.items), [] as Discipline[])
+        );
     }
 }

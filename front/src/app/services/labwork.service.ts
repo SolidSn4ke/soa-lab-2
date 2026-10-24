@@ -95,7 +95,7 @@ export class LabworkService {
 
         return this.http.post(
             this.labworkApiUrl,
-            toXml('Labwork', labwork),
+            toXml('LabWork', labwork),
             { headers: this.xmlHeaders, responseType: 'text' }
         ).pipe(
             map(xml => fromXml<Labwork>(xml))
@@ -116,7 +116,7 @@ export class LabworkService {
 
         return this.http.patch(
             `${this.labworkApiUrl}/${labworkId}`,
-            toXml('Labwork', data),
+            toXml('LabWork', data),
             { headers: this.xmlHeaders, responseType: 'text' }
         ).pipe(
             map(xml => fromXml<Labwork>(xml))
