@@ -116,7 +116,7 @@ export class DisciplineService {
 
         return this.http.put(
             `${this.labworkApiUrl}/${disciplineId}`,
-            toXml('discipline', data),
+            toXml('Discipline', data),
             {
                 headers: this.xmlHeaders,
                 responseType: 'text'

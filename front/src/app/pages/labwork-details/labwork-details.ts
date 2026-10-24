@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabworkService } from '../../services/labwork.service';
 import { Labwork } from '../../interfaces/Labwork';
@@ -11,7 +11,7 @@ import { LabworkForm } from '../../components/labwork-form/labwork-form';
   templateUrl: './labwork-details.html',
 })
 export class LabworkDetails implements OnInit {
-  public labworkDetails: Labwork | null = null;
+  public labworkDetails: WritableSignal<Labwork | null> = signal(null);
 
   public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly labworkService: LabworkService) { }
 
@@ -29,7 +29,7 @@ export class LabworkDetails implements OnInit {
   public loadLabworkDetails(id: number): void {
     this.labworkService.getById(id).subscribe({
       next: (labwork) => {
-        this.labworkDetails = labwork;
+        this.labworkDetails.set(labwork);
       },
       error: (error) => {
         console.error('Error loading labwork details:', error);
@@ -47,8 +47,11 @@ export class LabworkDetails implements OnInit {
 
   public onLabworkSaved(): void {
     this.closeForm();
-    if (this.labworkDetails) {
-      this.loadLabworkDetails(this.labworkDetails?.id);
+
+    const labwork = this.labworkDetails();
+
+    if (labwork) {
+      this.loadLabworkDetails(labwork.id);
     }
   }
 
@@ -67,12 +70,14 @@ export class LabworkDetails implements OnInit {
   }
 
   private deleteLabwork(): void {
-    if (!this.labworkDetails) {
+    const labwork = this.labworkDetails();
+
+    if (!labwork) {
       console.error('No labwork details available to delete.');
       return;
     }
 
-    this.labworkService.deleteLabwork(this.labworkDetails.id).subscribe({
+    this.labworkService.deleteLabwork(labwork.id).subscribe({
       next: () => {
         console.log('Labwork deleted successfully.');
         this.router.navigate(['/labworks']);
@@ -84,8 +89,10 @@ export class LabworkDetails implements OnInit {
   }
 
   public onRemoveDisciplineClick(): void {
-    if (this.labworkDetails) {
-      this.labworkService.removeDiscipline(this.labworkDetails);
+    const labwork = this.labworkDetails();
+
+    if (labwork) {
+      this.labworkService.removeDiscipline(labwork);
     }
   }
 }

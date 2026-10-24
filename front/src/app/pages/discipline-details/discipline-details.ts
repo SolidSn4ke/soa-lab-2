@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { Discipline } from '../../interfaces/Discipline';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DisciplineService } from '../../services/discipline.service';
@@ -11,7 +11,7 @@ import { DisciplineForm } from '../../components/discipline-form/discipline-form
   templateUrl: './discipline-details.html',
 })
 export class DisciplineDetails {
-  public disciplineDetails: Discipline | null = null;
+  public disciplineDetails: WritableSignal<Discipline | null> = signal(null);
 
   public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly disciplineService: DisciplineService) { }
 
@@ -27,7 +27,7 @@ export class DisciplineDetails {
   public loadDisciplineDetails(id: string): void {
     this.disciplineService.getById(id).subscribe({
       next: (discipline) => {
-        this.disciplineDetails = discipline;
+        this.disciplineDetails.set(discipline);
       },
       error: (error) => {
         console.error('Error loading discipline details:', error);
@@ -45,8 +45,10 @@ export class DisciplineDetails {
 
   public onDisciplineSaved(): void {
     this.closeForm();
-    if (this.disciplineDetails) {
-      this.loadDisciplineDetails(this.disciplineDetails?.name);
+    const discipline = this.disciplineDetails();
+
+    if (discipline) {
+      this.loadDisciplineDetails(discipline.name);
     }
   }
 
@@ -65,12 +67,14 @@ export class DisciplineDetails {
   }
 
   private deleteDiscipline(): void {
-    if (!this.disciplineDetails) {
+    const discipline = this.disciplineDetails();
+
+    if (!discipline) {
       console.error('No discipline details available to delete.');
       return;
     }
 
-    this.disciplineService.deleteDiscipline(this.disciplineDetails.name).subscribe({
+    this.disciplineService.deleteDiscipline(discipline.name).subscribe({
       next: () => {
         console.log('Discipline deleted successfully.');
         this.router.navigate(['/disciplines']);
@@ -82,8 +86,9 @@ export class DisciplineDetails {
   }
 
   public onMakeHardcoreClick(): void {
-    if (this.disciplineDetails?.name) {
-      this.disciplineService.makeHardcore(this.disciplineDetails?.name);
+    const discipline = this.disciplineDetails();
+    if (discipline) {
+      this.disciplineService.makeHardcore(discipline.name);
     }
   }
 }

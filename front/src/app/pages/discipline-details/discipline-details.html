@@ -1,13 +1,23 @@
 <section>
     <div class="container">
         @if (isFormOpen){
-        <app-discipline-form [discipline]="disciplineDetails" (saved)="onDisciplineSaved()" (closed)="closeForm()" />
+        <app-discipline-form [discipline]="disciplineDetails()" (saved)="onDisciplineSaved()" (closed)="closeForm()" />
         }
 
-        <h1>{{ disciplineDetails?.name }}</h1>
+        @if (!disciplineDetails()){
+        <div class="loading">
+            <span class="loading__circle"></span>
+            <span class="loading__text small-text">
+                Loading...
+            </span>
+        </div>
+        }
+
+        @else {
+        <h1>{{ disciplineDetails()?.name }}</h1>
         <div class="labwork-details__info default-text">
             <span>labsCount:</span>
-            <span> {{ disciplineDetails?.labsCount }} </span>
+            <span> {{ disciplineDetails()?.labsCount }} </span>
 
         </div>
         <div class="labwork-details__actions">
@@ -20,7 +30,10 @@
         </div>
 
         <div class="funny-actions default-text">
-            <button class="button button--secondary funny-button" (click)="onMakeHardcoreClick()">Make Hardcore</button>
+            <button class="button button--secondary funny-button" (click)="onMakeHardcoreClick()">
+                Make Hardcore
+            </button>
         </div>
+        }
     </div>
 </section>

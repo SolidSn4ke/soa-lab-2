@@ -1,27 +1,37 @@
 <section>
     <div class="container">
         @if (isFormOpen){
-        <app-labwork-form [labwork]="labworkDetails" (saved)="onLabworkSaved()" (closed)="closeForm()" />
+        <app-labwork-form [labwork]="labworkDetails()" (saved)="onLabworkSaved()" (closed)="closeForm()" />
         }
 
-        <h1>{{ labworkDetails?.name }}</h1>
+        @if (!labworkDetails()){
+        <div class="loading">
+            <span class="loading__circle"></span>
+            <span class="loading__text small-text">
+                Loading...
+            </span>
+        </div>
+        }
+
+        @else {
+        <h1>{{ labworkDetails()?.name }}</h1>
         <div class="labwork-details__info default-text">
             <span>ID:</span>
-            <span> {{ labworkDetails?.id }} </span>
+            <span> {{ labworkDetails()?.id }} </span>
             <span>X coordinate:</span>
-            <span> {{ labworkDetails?.coordinates.x }} </span>
+            <span> {{ labworkDetails()?.coordinates.x }} </span>
             <span>Y coordinate:</span>
-            <span> {{ labworkDetails?.coordinates.y }} </span>
+            <span> {{ labworkDetails()?.coordinates.y }} </span>
             <span>creationDate:</span>
-            <span> {{ labworkDetails?.creationDate }} </span>
+            <span> {{ labworkDetails()?.creationDate }} </span>
             <span>minimalPoint:</span>
-            <span> {{ labworkDetails?.minimalPoint }} </span>
+            <span> {{ labworkDetails()?.minimalPoint }} </span>
             <span>averagePoint:</span>
-            <span> {{ labworkDetails?.averagePoint }} </span>
+            <span> {{ labworkDetails()?.averagePoint }} </span>
             <span>difficulty:</span>
-            <span> {{ labworkDetails?.difficulty }} </span>
+            <span> {{ labworkDetails()?.difficulty }} </span>
             <span>discipline:</span>
-            <span> {{ labworkDetails?.discipline?.name }} </span>
+            <span> {{ labworkDetails()?.discipline?.name }} </span>
         </div>
         <div class="labwork-details__actions">
             <button class="button button--primary default-text labwork-details__actions--edit" (click)="onEditClick()">
@@ -33,7 +43,10 @@
         </div>
 
         <div class="funny-actions default-text">
-            <button class="button button--secondary funny-button" (click)="onRemoveDisciplineClick()">Remove Discipline</button>
+            <button class="button button--secondary funny-button" (click)="onRemoveDisciplineClick()">
+                Remove Discipline
+            </button>
         </div>
+        }
     </div>
 </section>
