@@ -2,11 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FilterItem } from '../../interfaces/FilterItem';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-export interface FilterField {
-  value: string;
-  label: string;
-}
+import { FilterField } from '../../interfaces/FilterField';
 
 @Component({
   imports: [CommonModule, FormsModule],

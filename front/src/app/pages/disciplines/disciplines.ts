@@ -7,10 +7,11 @@ import { SortItem } from '../../interfaces/SortItem';
 import { DisciplineForm } from '../../components/discipline-form/discipline-form';
 import { Router } from '@angular/router';
 import { Pagination } from '../../components/pagination/pagination';
-import { FilterField, FilterPanel } from '../../components/filter-panel/filter-panel';
+import { FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
 import { finalize } from 'rxjs';
+import { FilterField } from '../../interfaces/FilterField';
 
 @Component({
   imports: [FormsModule, DisciplineForm, Pagination, FilterPanel],

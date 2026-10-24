@@ -9,10 +9,11 @@ import { LabworkForm } from '../../components/labwork-form/labwork-form';
 import { FormsModule } from '@angular/forms';
 import { Difficulty } from '../../interfaces/Difficulty';
 import { Pagination } from '../../components/pagination/pagination';
-import { FilterField, FilterPanel } from '../../components/filter-panel/filter-panel';
+import { FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
 import { finalize } from 'rxjs';
+import { FilterField } from '../../interfaces/FilterField';
 
 @Component({
   imports: [CommonModule, LabworkForm, FormsModule, Pagination, FilterPanel],
