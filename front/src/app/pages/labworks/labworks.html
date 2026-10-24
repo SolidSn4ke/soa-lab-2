@@ -46,103 +46,103 @@
         <app-labwork-form [labwork]="null" (saved)="onLabworkSaved()" (closed)="closeForm()" />
         }
 
-        @if (isLoading()) {
-        <div class="loading">
-            <span class="loading__circle"></span>
-            <span class="loading__text small-text">
-                Loading...
-            </span>
-        </div>
-        }
-
-        @else if (errorMessage) {
+        @if (errorMessage) {
         <div class="error">
             {{ errorMessage }}
         </div>
         }
 
-        @else {
-        <div class="table__wrapper default-text">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th (click)="onSortClick('id')">
-                            <span>ID</span>
-                            @if (getSort('id')){
-                            <span class="sort-arrow">
-                                {{ getSort('id') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('name')">
-                            <span>Name</span>
-                            @if (getSort('name')){
-                            <span class="sort-arrow">
-                                {{ getSort('name') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('difficulty')">
-                            <span>Difficulty</span>
-                            @if (getSort('difficulty')){
-                            <span class="sort-arrow">
-                                {{ getSort('difficulty') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('minimalPoint')">
-                            <span>Minimal Point</span>
-                            @if (getSort('minimalPoint')){
-                            <span class="sort-arrow">
-                                {{ getSort('minimalPoint') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('averagePoint')">
-                            <span>Average Point</span>
-                            @if (getSort('averagePoint')){
-                            <span class="sort-arrow">
-                                {{ getSort('averagePoint') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('creationDate')">
-                            <span>Creation date</span>
-                            @if (getSort('creationDate')){
-                            <span class="sort-arrow">
-                                {{ getSort('creationDate') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                        <th (click)="onSortClick('discipline.name')">
-                            <span>Discipline</span>
-                            @if (getSort('discipline.name')){
-                            <span class="sort-arrow">
-                                {{ getSort('discipline.name') === 'desc' ? '↑' : '↓' }}
-                            </span>
-                            }
-                        </th>
-                    </tr>
-                </thead>
+        <div class="table-container" [class.table-container--loading]="isLoading()">
+            @if (isLoading()) {
+            <div class="loading">
+                <span class="loading__circle"></span>
+                <span class="loading__text small-text">
+                    Loading...
+                </span>
+            </div>
+            }
 
-                <tbody>
-                    @for (labwork of labworks; track labwork.id) {
-                    <tr (click)="onLabworkClick(labwork.id)">
-                        <td>{{ labwork.id }}</td>
-                        <td>{{ labwork.name }}</td>
-                        <td>{{labwork.difficulty}}</td>
-                        <td>{{labwork.minimalPoint}}</td>
-                        <td>{{labwork.averagePoint}}</td>
-                        <td>{{ labwork.creationDate | date:'dd.MM.yyyy' }}</td>
-                        <td>{{labwork.discipline?.name}}</td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+            <div class="table__wrapper default-text">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th (click)="onSortClick('id')">
+                                <span>ID</span>
+                                @if (getSort('id')){
+                                <span class="sort-arrow">
+                                    {{ getSort('id') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('name')">
+                                <span>Name</span>
+                                @if (getSort('name')){
+                                <span class="sort-arrow">
+                                    {{ getSort('name') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('difficulty')">
+                                <span>Difficulty</span>
+                                @if (getSort('difficulty')){
+                                <span class="sort-arrow">
+                                    {{ getSort('difficulty') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('minimalPoint')">
+                                <span>Minimal Point</span>
+                                @if (getSort('minimalPoint')){
+                                <span class="sort-arrow">
+                                    {{ getSort('minimalPoint') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('averagePoint')">
+                                <span>Average Point</span>
+                                @if (getSort('averagePoint')){
+                                <span class="sort-arrow">
+                                    {{ getSort('averagePoint') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('creationDate')">
+                                <span>Creation date</span>
+                                @if (getSort('creationDate')){
+                                <span class="sort-arrow">
+                                    {{ getSort('creationDate') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                            <th (click)="onSortClick('discipline.name')">
+                                <span>Discipline</span>
+                                @if (getSort('discipline.name')){
+                                <span class="sort-arrow">
+                                    {{ getSort('discipline.name') === 'desc' ? '↑' : '↓' }}
+                                </span>
+                                }
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (labwork of labworks; track labwork.id) {
+                        <tr (click)="onLabworkClick(labwork.id)">
+                            <td>{{ labwork.id }}</td>
+                            <td>{{ labwork.name }}</td>
+                            <td>{{labwork.difficulty}}</td>
+                            <td>{{labwork.minimalPoint}}</td>
+                            <td>{{labwork.averagePoint}}</td>
+                            <td>{{ labwork.creationDate | date:'dd.MM.yyyy' }}</td>
+                            <td>{{labwork.discipline?.name}}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [totalElements]="totalElements"
+                [visiblePages]="visiblePages" (pageChange)="goToPage($event)" />
         </div>
-
-        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [totalElements]="totalElements"
-            [visiblePages]="visiblePages" (pageChange)="goToPage($event)" />
-        }
     </div>
 </section>
