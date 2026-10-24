@@ -1,11 +1,12 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { mockDisciplines } from './mock/discipline.mock';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { Discipline } from '../interfaces/Discipline';
 import { PageInfo } from '../interfaces/PageInfo';
 import { API_URLS } from '../constants/api.constants';
+import { fromXml, toXml } from '../utils/xml.utils';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,11 @@ import { API_URLS } from '../constants/api.constants';
 export class DisciplineService {
     private readonly labworkApiUrl = `${API_URLS.labwork}/disciplines`;
     private readonly barsApiUrl = `${API_URLS.bars}/discipline`;
+
+    private readonly xmlHeaders = new HttpHeaders({
+        'Content-Type': 'application/xml',
+        'Accept': 'application/xml',
+    })
 
     public constructor(private readonly http: HttpClient) { }
 
@@ -26,7 +32,6 @@ export class DisciplineService {
             const start = page * size;
             const end = start + size;
             const items = mockDisciplines.slice(start, end);
-
             return of({
                 page: page,
                 size: size,
@@ -35,7 +40,6 @@ export class DisciplineService {
                 items: items
             });
         }
-
 
         let params = new HttpParams()
             .set('page', page)
@@ -49,9 +53,12 @@ export class DisciplineService {
             params = params.append('search', searchItem);
         }
 
-        return this.http.get<PageInfo<Discipline>>(
-            this.labworkApiUrl,
-            { params }
+        return this.http.get(this.labworkApiUrl, {
+            params,
+            headers: this.xmlHeaders,
+            responseType: 'text'
+        }).pipe(
+            map(xml => fromXml<PageInfo<Discipline>>(xml))
         );
     }
 
@@ -66,7 +73,13 @@ export class DisciplineService {
             }
         }
 
-        return this.http.get<Discipline>(`${this.labworkApiUrl}/${id}`);
+        return this.http.get(`${this.labworkApiUrl}/${id}`, {
+            headers: this.xmlHeaders,
+            responseType: 'text'
+        }
+        ).pipe(
+            map(xml => fromXml<Discipline>(xml))
+        );
     }
 
     public createDiscipline(discipline: Discipline): Observable<Discipline> {
@@ -77,7 +90,16 @@ export class DisciplineService {
             return of(newDiscipline);
         }
 
-        return this.http.post<Discipline>(this.labworkApiUrl, discipline);
+        return this.http.post(
+            this.labworkApiUrl,
+            toXml('Discipline', discipline),
+            {
+                headers: this.xmlHeaders,
+                responseType: 'text'
+            })
+            .pipe(
+                map(xml => fromXml<Discipline>(xml))
+            );
     }
 
     public updateDiscipline(disciplineId: string, data: Discipline): Observable<Discipline> {
@@ -92,7 +114,16 @@ export class DisciplineService {
             }
         }
 
-        return this.http.put<Discipline>(`${this.labworkApiUrl}/${disciplineId}`, data);
+        return this.http.put(
+            `${this.labworkApiUrl}/${disciplineId}`,
+            toXml('discipline', data),
+            {
+                headers: this.xmlHeaders,
+                responseType: 'text'
+            }
+        ).pipe(
+            map(xml => fromXml<Discipline>(xml))
+        );
     }
 
     public deleteDiscipline(id: string): Observable<void> {
@@ -107,10 +138,13 @@ export class DisciplineService {
             }
         }
 
-        return this.http.delete<void>(`${this.labworkApiUrl}/${id}`);
+        return this.http.delete<void>(
+            `${this.labworkApiUrl}/${id}`,
+            { headers: this.xmlHeaders });
     }
 
     public makeHardcore(disciplineId: string): Observable<void> {
+        //Mock data
         if (environment.useMocks) {
             return of(void 0);
         }

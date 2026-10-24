@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Labwork } from '../../interfaces/Labwork';
 import { LabworkService } from '../../services/labwork.service';
 import { Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { Pagination } from '../../components/pagination/pagination';
 import { FilterField, FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
+import { finalize } from 'rxjs';
 
 @Component({
   imports: [CommonModule, LabworkForm, FormsModule, Pagination, FilterPanel],
@@ -32,7 +33,7 @@ export class Labworks implements OnInit {
 
   public isFormOpen: boolean = false;
 
-  public isLoading: boolean = false;
+  public isLoading = signal(false);
   public errorMessage: string | null = null;
 
   public readonly filterFields: FilterField[] = [
@@ -51,25 +52,29 @@ export class Labworks implements OnInit {
   }
 
   public loadLabworks(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.errorMessage = null;
 
     const sort = buildSortParams(this.sortRules);
     const search = buildSearchParams(this.filters);
 
     this.labworkService.getLabworks(this.currentPage, this.pageSize, sort, search)
+      .pipe(finalize(() => {
+        this.isLoading.set(false);
+      }))
       .subscribe({
         next: (pageInfo) => {
+          console.log("Получены данные:", pageInfo);
+
           this.labworks = pageInfo.items;
           this.currentPage = pageInfo.page;
           this.pageSize = pageInfo.size;
           this.totalPages = pageInfo.totalPages;
           this.totalElements = pageInfo.totalElements;
-          this.isLoading = false;
         },
         error: (error) => {
+          console.log("Ошибка загрузки:", error);
           this.errorMessage = error;
-          this.isLoading = false;
         }
       });
   }

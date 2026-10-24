@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FilterItem } from '../../interfaces/FilterItem';
+import { CommonModule } from '@angular/common';
 
 export interface FilterField {
   value: string;
@@ -7,7 +8,7 @@ export interface FilterField {
 }
 
 @Component({
-  imports: [],
+  imports: [CommonModule],
   selector: 'app-filter-panel',
   styleUrl: './filter-panel.scss',
   templateUrl: './filter-panel.html',

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { FilterItem } from '../../interfaces/FilterItem';
 import { FormsModule } from '@angular/forms';
 import { DisciplineService } from '../../services/discipline.service';
@@ -10,6 +10,7 @@ import { Pagination } from '../../components/pagination/pagination';
 import { FilterField, FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
+import { finalize } from 'rxjs';
 
 @Component({
   imports: [FormsModule, DisciplineForm, Pagination, FilterPanel],
@@ -30,7 +31,7 @@ export class Disciplines implements OnInit {
 
   public isFormOpen: boolean = false;
 
-  public isLoading: boolean = false;
+  public isLoading: WritableSignal<boolean> = signal(false);
   public errorMessage: string | null = null;
 
   public readonly filterFields: FilterField[] = [
@@ -45,13 +46,18 @@ export class Disciplines implements OnInit {
   }
 
   public loadDisciplines(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.errorMessage = null;
 
     const sort = buildSortParams(this.sortRules);
     const search = buildSearchParams(this.filters);
 
     this.disciplineService.getDisciplines(this.currentPage, this.pageSize, sort, search)
+      .pipe(
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
       .subscribe({
         next: (pageInfo) => {
           this.disciplines = pageInfo.items;
@@ -59,11 +65,9 @@ export class Disciplines implements OnInit {
           this.pageSize = pageInfo.size;
           this.totalPages = pageInfo.totalPages;
           this.totalElements = pageInfo.totalElements;
-          this.isLoading = false;
         },
         error: (error) => {
           this.errorMessage = error;
-          this.isLoading = false;
         }
       });
   }

@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { PageInfo } from '../interfaces/PageInfo';
 import { CreateLabwork, Labwork } from '../interfaces/Labwork';
 import { Observable } from 'rxjs/internal/Observable';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { mockLabworks } from './mock/labwork.mock';
-import { of, throwError } from 'rxjs';
+import { map, of, throwError } from 'rxjs';
 import { Difficulty } from '../interfaces/Difficulty';
 import { API_URLS } from '../constants/api.constants';
+import { fromXml, toXml } from '../utils/xml.utils';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +16,11 @@ import { API_URLS } from '../constants/api.constants';
 export class LabworkService {
     private readonly labworkApiUrl = `${API_URLS.labwork}/labworks`;
     private readonly barsApiUrl = `${API_URLS.bars}/discipline`;
+
+    private readonly xmlHeaders = new HttpHeaders({
+        'Content-Type': 'application/xml',
+        'Accept': 'application/xml',
+    })
 
     public constructor(private readonly http: HttpClient) { }
 
@@ -38,7 +44,6 @@ export class LabworkService {
             });
         }
 
-
         let params = new HttpParams()
             .set('page', page)
             .set('size', size);
@@ -51,9 +56,12 @@ export class LabworkService {
             params = params.append('search', searchItem);
         }
 
-        return this.http.get<PageInfo<Labwork>>(
-            this.labworkApiUrl,
-            { params }
+        return this.http.get(this.labworkApiUrl, {
+            params,
+            headers: this.xmlHeaders,
+            responseType: 'text'
+        }).pipe(
+            map(xml => fromXml<PageInfo<Labwork>>(xml))
         );
     }
 
@@ -68,7 +76,12 @@ export class LabworkService {
             return throwError(() => new Error(`Labwork with ID ${id} not found`));
         }
 
-        return this.http.get<Labwork>(`${this.labworkApiUrl}/${id}`);
+        return this.http.get(
+            `${this.labworkApiUrl}/${id}`,
+            { headers: this.xmlHeaders, responseType: 'text' }
+        ).pipe(
+            map(xml => fromXml<Labwork>(xml))
+        );
     }
 
     public createLabwork(labwork: CreateLabwork): Observable<Labwork> {
@@ -80,7 +93,13 @@ export class LabworkService {
             return of(newLabwork);
         }
 
-        return this.http.post<Labwork>(this.labworkApiUrl, labwork);
+        return this.http.post(
+            this.labworkApiUrl,
+            toXml('Labwork', labwork),
+            { headers: this.xmlHeaders, responseType: 'text' }
+        ).pipe(
+            map(xml => fromXml<Labwork>(xml))
+        );
     }
 
     public updateLabwork(labworkId: number, data: Labwork): Observable<Labwork> {
@@ -95,7 +114,13 @@ export class LabworkService {
             }
         }
 
-        return this.http.patch<Labwork>(`${this.labworkApiUrl}/${labworkId}`, data);
+        return this.http.patch(
+            `${this.labworkApiUrl}/${labworkId}`,
+            toXml('Labwork', data),
+            { headers: this.xmlHeaders, responseType: 'text' }
+        ).pipe(
+            map(xml => fromXml<Labwork>(xml))
+        );
     }
 
     public deleteLabwork(id: number): Observable<void> {
@@ -110,7 +135,7 @@ export class LabworkService {
             }
         }
 
-        return this.http.delete<void>(`${this.labworkApiUrl}/${id}`);
+        return this.http.delete<void>(`${this.labworkApiUrl}/${id}`, { headers: this.xmlHeaders });
     }
 
     public removeDiscipline(labwork: Labwork) {

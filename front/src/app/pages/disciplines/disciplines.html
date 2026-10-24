@@ -24,7 +24,7 @@
         <app-discipline-form [discipline]="null" (saved)="onDisciplineSaved()" (closed)="closeForm()" />
         }
 
-        @if (isLoading) {
+        @if (isLoading()) {
         <div class="loading">
             <span class="loading__circle"></span>
             <span class="loading__text small-text">
