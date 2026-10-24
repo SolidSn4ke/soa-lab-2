@@ -46,12 +46,6 @@
         <app-labwork-form [labwork]="null" (saved)="onLabworkSaved()" (closed)="closeForm()" />
         }
 
-        @if (errorMessage) {
-        <div class="error">
-            {{ errorMessage }}
-        </div>
-        }
-
         <div class="table-container" [class.table-container--loading]="isLoading()">
             @if (isLoading()) {
             <div class="loading">

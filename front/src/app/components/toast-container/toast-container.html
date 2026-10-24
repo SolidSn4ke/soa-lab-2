@@ -3,9 +3,27 @@
     <div class="toast" role="alert">
         <span class="toast__icon">!</span>
 
-        <span class="toast__message">
-            {{ toast.message }}
-        </span>
+        <div class="toast__content">
+            <span class="toast__status">
+                HTTP {{ toast.status }}
+            </span>
+
+            <span class="toast__message">
+                {{ toast.message }}
+            </span>
+
+            @if (toast.details) {
+            <div class="toast__details">
+                @if (isArray(toast.details)) {
+                @for (detail of toast.details; track $index) {
+                <p>{{ detail }}</p>
+                }
+                } @else {
+                <p>{{ toast.details }}</p>
+                }
+            </div>
+            }
+        </div>
 
         <button class="toast__close" type="button" aria-label="Close notification"
             (click)="notifications.dismiss(toast.id)">

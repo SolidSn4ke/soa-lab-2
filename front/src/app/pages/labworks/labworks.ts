@@ -36,7 +36,6 @@ export class Labworks implements OnInit {
   public difficulty: Difficulty | null = null;
 
   public isLoading = signal(false);
-  public errorMessage: string | null = null;
 
   public readonly filterFields: FilterField[] = [
     { value: 'id', label: 'ID' },
@@ -55,7 +54,6 @@ export class Labworks implements OnInit {
 
   public loadLabworks(): void {
     this.isLoading.set(true);
-    this.errorMessage = null;
 
     const sort = buildSortParams(this.sortRules);
     const search = buildSearchParams(this.filters);
@@ -75,8 +73,7 @@ export class Labworks implements OnInit {
           this.totalElements = pageInfo.totalElements;
         },
         error: (error) => {
-          console.log("Ошибка загрузки:", error);
-          this.errorMessage = error;
+          console.error("Ошибка загрузки:", error);
         }
       });
   }

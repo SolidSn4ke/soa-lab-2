@@ -32,7 +32,6 @@ export class Disciplines implements OnInit {
   public isFormOpen: boolean = false;
 
   public isLoading: WritableSignal<boolean> = signal(false);
-  public errorMessage: string | null = null;
 
   public readonly filterFields: FilterField[] = [
     { value: 'name', label: 'Name' },
@@ -47,7 +46,6 @@ export class Disciplines implements OnInit {
 
   public loadDisciplines(): void {
     this.isLoading.set(true);
-    this.errorMessage = null;
 
     const sort = buildSortParams(this.sortRules);
     const search = buildSearchParams(this.filters);
@@ -67,7 +65,7 @@ export class Disciplines implements OnInit {
           this.totalElements = pageInfo.totalElements;
         },
         error: (error) => {
-          this.errorMessage = error;
+          console.error(error)
         }
       });
   }

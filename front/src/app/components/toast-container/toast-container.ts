@@ -9,4 +9,8 @@ import { NotificationService } from '../../services/notification.service';
 })
 export class ToastContainer {
   readonly notifications = inject(NotificationService);
+
+  public isArray(value: string | string[]): value is string[] {
+    return Array.isArray(value);
+  }
 }
