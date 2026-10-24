@@ -4,4 +4,10 @@
         gap: 20px;
         align-items: center;
     }
+
+    @media (max-width: 500px) {
+        &__funny-options {
+            flex-direction: column;
+        }
+    }
 }

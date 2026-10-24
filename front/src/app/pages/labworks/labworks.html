@@ -22,6 +22,10 @@
             <button class="button button--secondary" (click)="onRemoveByDifficultyClick()">
                 Remove by Difficulty
             </button>
+
+            @if (showDifficultyError) {
+            <span class="error">Difficulty is required</span>
+            }
         </div>
     </div>
 </section>

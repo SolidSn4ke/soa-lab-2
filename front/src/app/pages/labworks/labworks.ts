@@ -35,6 +35,7 @@ export class Labworks implements OnInit {
   public isFormOpen: boolean = false;
 
   public difficulty: Difficulty | null = null;
+  public showDifficultyError: boolean = false;
 
   public isLoading = signal(false);
 
@@ -167,9 +168,13 @@ export class Labworks implements OnInit {
     this.loadLabworks();
   }
 
-  public onRemoveByDifficultyClick() {
-    if (this.difficulty) {
-      this.labworkService.removeByDifficulty(this.difficulty);
+  public onRemoveByDifficultyClick(): void {
+    if (!this.difficulty) {
+      this.showDifficultyError = true;
+      return;
     }
+
+    this.showDifficultyError = false;
+    this.labworkService.removeByDifficulty(this.difficulty);
   }
 }
