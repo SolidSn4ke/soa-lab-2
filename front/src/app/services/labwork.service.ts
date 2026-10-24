@@ -138,7 +138,7 @@ export class LabworkService {
         return this.http.delete<void>(`${this.labworkApiUrl}/${id}`, { headers: this.xmlHeaders });
     }
 
-    public removeDiscipline(labwork: Labwork) {
+    public removeDiscipline(labwork: Labwork): Observable<void> {
         const disciplineId = labwork.discipline?.name;
 
         //Mock data
@@ -149,14 +149,13 @@ export class LabworkService {
         return this.http.delete<void>(`${this.barsApiUrl}/${disciplineId}/labwork/${labwork.id}/remove`);
     }
 
-    public removeByDifficulty(difficulty: Difficulty) {
+    public removeByDifficulty(difficulty: Difficulty): Observable<void> {
         //Mock data
         if (environment.useMocks) {
             return of(undefined);
         }
 
         let params = new HttpParams().set('difficulty', difficulty)
-
         return this.http.delete<void>(`${this.labworkApiUrl}`, { params });
     }
 }

@@ -33,6 +33,8 @@ export class Labworks implements OnInit {
 
   public isFormOpen: boolean = false;
 
+  public difficulty: Difficulty | null = null;
+
   public isLoading = signal(false);
   public errorMessage: string | null = null;
 
@@ -165,8 +167,6 @@ export class Labworks implements OnInit {
     this.closeForm();
     this.loadLabworks();
   }
-
-  public difficulty: Difficulty | null = null;
 
   public onRemoveByDifficultyClick() {
     if (this.difficulty) {

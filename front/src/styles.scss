@@ -11,6 +11,7 @@
 
     --color-surface: #f0f0f0;
     --color-surface-hover: #a0a0a0;
+    --color-surface-alternative: #e0e0e0;
 
     --color-text-primary: #1D1D1D;
     --color-text-secondary: #525252;
@@ -233,7 +234,7 @@ label {
             }
 
             &:nth-child(even) {
-                background-color: var(--color-surface-alternate);
+                background-color: var(--color-surface-alternative);
             }
 
             &:hover {
