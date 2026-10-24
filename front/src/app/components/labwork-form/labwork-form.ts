@@ -30,8 +30,8 @@ export class LabworkForm implements OnChanges, OnInit {
         x: [0, [Validators.required]],
         y: [0, [Validators.required]],
       }),
-      minimalPoint: [0, [Validators.required]],
-      averagePoint: [0, [Validators.required]],
+      minimalPoint: [0, [Validators.required, Validators.min(1)]],
+      averagePoint: [0, [Validators.required, Validators.min(1)]],
       difficulty: ['EASY', [Validators.required]],
       disciplineId: ['', [Validators.required]],
     });

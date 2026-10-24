@@ -114,7 +114,7 @@ export class LabworkService {
             }
         }
 
-        return this.http.patch(
+        return this.http.put(
             `${this.labworkApiUrl}/${labworkId}`,
             toXml('LabWork', data),
             { headers: this.xmlHeaders, responseType: 'text' }

@@ -5,21 +5,48 @@
 
     <form class="default-text form" [formGroup]="form" (ngSubmit)="onSubmit()">
         <label for="name">Name:</label>
-        <input id="name" type="text" formControlName="name" />
+        <input id="name" type="text" formControlName="name"
+            [class.input--error]="form.get('name')?.invalid && form.get('name')?.touched" />
+
+        @if (form.get('name')?.hasError('required') && form.get('name')?.touched){
+        <span class="error small-text form__error">Name is required</span>
+        }
 
         <div class="form-group" formGroupName="coordinates">
             <label for="coordinates-x">X Coordinate:</label>
-            <input id="coordinates-x" type="number" formControlName="x" />
+            <input id="coordinates-x" type="number" formControlName="x"
+                [class.input--error]="form.get('coordinates.x')?.invalid && form.get('coordinates.x')?.touched" />
+            @if (form.get('coordinates.x')?.invalid && form.get('coordinates.x')?.touched) {
+            <span class="error small-text form__error">X is required</span>
+            }
 
             <label for="coordinates-y">Y Coordinate:</label>
-            <input id="coordinates-y" type="number" formControlName="y" />
+            <input id="coordinates-y" type="number" formControlName="y"
+                [class.input--error]="form.get('coordinates.y')?.invalid && form.get('coordinates.y')?.touched" />
+            @if (form.get('coordinates.y')?.invalid && form.get('coordinates.y')?.touched) {
+            <span class="error small-text form__error">Y is required</span>
+            }
         </div>
 
         <label for="minimalPoint">Minimal Point:</label>
-        <input id="minimalPoint" formControlName="minimalPoint" type="number" />
+        <input id="minimalPoint" formControlName="minimalPoint" type="number"
+            [class.input--error]="form.get('minimalPoint')?.invalid && form.get('minimalPoint')?.touched" />
+
+        @if (form.get('minimalPoint')?.hasError('required') && form.get('minimalPoint')?.touched){
+        <span class="error small-text form__error">Minimal Point is required</span>
+        } @else if (form.get('minimalPoint')?.hasError('min') && form.get('minimalPoint')?.touched){
+        <span class="error small-text form__error">Minimal Point >= 1</span>
+        }
 
         <label for="averagePoint">Average Point:</label>
-        <input id="averagePoint" formControlName="averagePoint" type="number" />
+        <input id="averagePoint" formControlName="averagePoint" type="number"
+            [class.input--error]="form.get('averagePoint')?.invalid && form.get('averagePoint')?.touched" />
+
+        @if (form.get('averagePoint')?.hasError('required') && form.get('averagePoint')?.touched){
+        <span class="error small-text form__error">Average Point is required</span>
+        } @else if (form.get('averagePoint')?.hasError('min') && form.get('averagePoint')?.touched){
+        <span class="error small-text form__error">Average Point >= 1</span>
+        }
 
         <label for="difficulty">Difficulty:</label>
         <select id="difficulty" formControlName="difficulty">
@@ -32,7 +59,8 @@
         </select>
 
         <label for="disciplineId">Discipline:</label>
-        <select id="disciplineId" formControlName="disciplineId">
+        <select id="disciplineId" formControlName="disciplineId"
+            [class.select--error]="form.get('disciplineId')?.invalid && form.get('disciplineId')?.touched">
             <option value="">Select Discipline</option>
 
             @for (discipline of disciplines; track discipline.name) {
@@ -41,6 +69,10 @@
             </option>
             }
         </select>
+
+        @if (form.get('disciplineId')?.hasError('required') && form.get('disciplineId')?.touched){
+        <span class="error small-text form__error">Discipline is required</span>
+        }
 
         @if (errorMessage){
         <p>{{errorMessage}}</p>

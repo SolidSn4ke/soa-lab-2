@@ -5,10 +5,19 @@
 
     <form class="default-text form" [formGroup]="form" (ngSubmit)="onSubmit()">
         <label for="name">Name:</label>
-        <input id="name" type="text" formControlName="name" />
+        <input id="name" type="text" formControlName="name"
+            [class.input--error]="form.get('name')?.invalid && form.get('name')?.touched" />
+        @if (form.get('name')?.hasError('required') && form.get('name')?.touched){
+        <span class="error small-text form__error">Name is required</span>
+        }
 
         <label for="labsCount">Labs Count:</label>
-        <input id="labsCount" formControlName="labsCount" type="number" />
+        <input id="labsCount" formControlName="labsCount" type="number"
+            [class.input--error]="form.get('labsCount')?.invalid && form.get('labsCount')?.touched" />
+        @if (form.get('labsCount')?.hasError('required') && form.get('labsCount')?.touched){
+        <span class="error small-text form__error">Labs Count is required</span>
+        }
+
         @if (errorMessage){
         <p>{{errorMessage}}</p>
         }
