@@ -92,6 +92,12 @@ public class LabworkService {
                 .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
                         List.of(String.format("Labwork with id '%s' was not found", id))));
         mapper.updateFromPatch(req, entity);
+        if (req.getDisciplineId() != null && !req.getDisciplineId().isBlank()) {
+            DisciplineEntity discipline = disciplineRepo.findById(req.getDisciplineId())
+                    .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                            List.of(String.format("Discipline '%s' was not found", req.getDisciplineId()))));
+            entity.setDiscipline(discipline);
+        }
         entity = labworkRepo.update(entity);
         return mapper.toDto(entity);
     }

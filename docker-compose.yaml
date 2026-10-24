@@ -10,6 +10,17 @@ services:
     depends_on:
       - labwork-service
 
+  discipline-service:
+    build:
+      context: ./discipline-service
+    image: discipline-service:local
+    ports:
+      - 8081:8080
+    environment:
+      LABWORK_SERVICE_BASE_URL: http://labwork-service:8080/labwork-service
+    depends_on:
+      - labwork-service
+  
   labwork-service:
     build:
       context: ./labwork-service
