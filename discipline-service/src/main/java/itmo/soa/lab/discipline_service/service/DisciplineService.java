@@ -1,15 +1,16 @@
 package itmo.soa.lab.discipline_service.service;
 
-import java.util.Comparator;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import itmo.soa.lab.discipline_service.model.dto.Labwork;
 import itmo.soa.lab.discipline_service.exception.ApiException;
-import itmo.soa.lab.discipline_service.model.dto.Discipline;
+import itmo.soa.lab.discipline_service.model.dto.discipline.Discipline;
+import itmo.soa.lab.discipline_service.model.dto.labwork.Labwork;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class DisciplineService {
     private final LabworkClient client;
 
@@ -26,17 +27,15 @@ public class DisciplineService {
     public Discipline makeHardcore(String disciplineId) {
         validateDisciplineId(disciplineId);
         Discipline discipline = client.getDiscipline(disciplineId);
-        var candidates = client.getLabworks().stream()
+        List<Integer> labworksIds = client.getLabworks().stream()
                 .filter(lab -> lab.discipline() != null && !disciplineId.equals(lab.discipline().name()))
-                .sorted(Comparator.<Labwork>comparingInt(lab -> lab.difficulty() == null
-                        ? -1 : lab.difficulty().ordinal()).reversed().thenComparingInt(Labwork::id))
-                .limit(10).toList();
-        if (candidates.isEmpty()) {
+                .limit(10)
+                .map(e -> e.id())
+                .toList();
+        if (labworksIds.isEmpty()) {
             return discipline;
         }
-        for (Labwork labwork : candidates) {
-            client.assignDiscipline(labwork.id(), disciplineId);
-        }
+        client.assignBatch(labworksIds, disciplineId);
         return client.getDiscipline(disciplineId);
     }
 

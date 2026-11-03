@@ -2,44 +2,39 @@ package itmo.soa.lab.discipline_service.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
-
-import itmo.soa.lab.discipline_service.exception.ApiException;
-import itmo.soa.lab.discipline_service.model.dto.Assignment;
-import itmo.soa.lab.discipline_service.model.dto.Discipline;
-import itmo.soa.lab.discipline_service.model.dto.Labwork;
-import itmo.soa.lab.discipline_service.model.dto.LabworkPage;
+import itmo.soa.lab.discipline_service.model.dto.PageInfo;
+import itmo.soa.lab.discipline_service.model.dto.discipline.Discipline;
+import itmo.soa.lab.discipline_service.model.dto.labwork.BatchAssignRequestBody;
+import itmo.soa.lab.discipline_service.model.dto.labwork.Labwork;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
 
 @Component
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class LabworkClient {
     private final RestClient client;
 
     public Discipline getDiscipline(String id) {
-        return call(() -> required(client.get().uri("/disciplines/{id}", id)
-                .retrieve().body(Discipline.class)));
+        return client.get().uri("/disciplines/{id}", id).retrieve().body(Discipline.class);
     }
 
     public Labwork getLabwork(int id) {
-        return call(() -> required(client.get().uri("/labworks/{id}", id)
-                .retrieve().body(Labwork.class)));
+        return client.get().uri("/labworks/{id}", id).retrieve().body(Labwork.class);
     }
 
     public List<Labwork> getLabworks() {
         List<Labwork> result = new ArrayList<>();
         for (int page = 0;; page++) {
             int currentPage = page;
-            LabworkPage response = call(() -> required(client.get()
+            PageInfo<Labwork> response = client.get()
                     .uri(uri -> uri.path("/labworks").queryParam("page", currentPage)
                             .queryParam("size", 100).queryParam("sort", "id,asc").build())
-                    .retrieve().body(LabworkPage.class)));
+                    .retrieve().body(new ParameterizedTypeReference<PageInfo<Labwork>>() {
+                    });
             if (response.items != null) {
                 result.addAll(response.items);
             }
@@ -49,36 +44,13 @@ public class LabworkClient {
         }
     }
 
-    public void assignDiscipline(int id, String disciplineId) {
-        call(() -> client.patch().uri("/labworks/{id}", id).contentType(MediaType.APPLICATION_XML)
-                .body(new Assignment(disciplineId)).retrieve().toBodilessEntity());
+    public void assignBatch(List<Integer> labworkIds, String disciplineId) {
+        client.post().uri("/labworks/batch").contentType(MediaType.APPLICATION_XML)
+                .body(new BatchAssignRequestBody(disciplineId, labworkIds)).retrieve().toBodilessEntity();
     }
 
     public void deleteLabwork(int id) {
-        call(() -> client.delete().uri("/labworks/{id}", id).retrieve().toBodilessEntity());
-    }
-
-    private <T> T required(T body) {
-        if (body == null) {
-            throw new ApiException(503, "Labwork service returned an empty response");
-        }
-        return body;
-    }
-
-    private <T> T call(Supplier<T> operation) {
-        try {
-            return operation.get();
-        } catch (RestClientResponseException exception) {
-            if (exception.getStatusCode().value() == 404) {
-                throw new ApiException(404, "Requested discipline or labwork was not found");
-            }
-            if (exception.getStatusCode().is5xxServerError()) {
-                throw new ApiException(503, "Labwork service is temporarily unavailable");
-            }
-            throw new ApiException(500, "Labwork service rejected the operation");
-        } catch (RestClientException exception) {
-            throw new ApiException(503, "Labwork service is temporarily unavailable");
-        }
+        client.delete().uri("/labworks/{id}", id).retrieve().toBodilessEntity();
     }
 
 }

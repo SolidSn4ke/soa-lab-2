@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import itmo.soa.lab.discipline_service.model.dto.ErrorMsg;
@@ -21,6 +23,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorMsg> handleInvalidId(MethodArgumentTypeMismatchException exception) {
         return error(400, "Invalid identifier: " + exception.getName());
+    }
+
+    @ExceptionHandler(RestClientResponseException.class)
+    public ResponseEntity<ErrorMsg> handleRestClient(RestClientResponseException exception) {
+        String detail = switch (exception.getStatusCode().value()) {
+            case 400 -> "Bad request to external service: " + exception.getResponseBodyAsString();
+            case 404 -> "Requested resource was not found";
+            default -> "External service returned an error: " + exception.getResponseBodyAsString();
+        };
+        return error(exception.getStatusCode().value(), detail);
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<ErrorMsg> handleRestClient(RestClientException exception) {
+        return error(503, "External service unavailable: " + exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
