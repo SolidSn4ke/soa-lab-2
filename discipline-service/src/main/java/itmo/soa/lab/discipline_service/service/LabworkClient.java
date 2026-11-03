@@ -1,4 +1,4 @@
-package itmo.soa.lab.discipline_service;
+package itmo.soa.lab.discipline_service.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,27 +9,18 @@ import itmo.soa.lab.discipline_service.model.dto.Assignment;
 import itmo.soa.lab.discipline_service.model.dto.Discipline;
 import itmo.soa.lab.discipline_service.model.dto.Labwork;
 import itmo.soa.lab.discipline_service.model.dto.LabworkPage;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.xml.JacksonXmlHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 @Component
+@RequiredArgsConstructor 
 public class LabworkClient {
     private final RestClient client;
-
-    public LabworkClient(@Value("${labwork-service.base-url}") String baseUrl) {
-        this.client = RestClient.builder()
-                .baseUrl(baseUrl)
-                .defaultHeader("Accept", MediaType.APPLICATION_XML_VALUE)
-                .configureMessageConverters(converters -> converters.withXmlConverter(
-                        new JacksonXmlHttpMessageConverter()))
-                .build();
-    }
 
     public Discipline getDiscipline(String id) {
         return call(() -> required(client.get().uri("/disciplines/{id}", id)

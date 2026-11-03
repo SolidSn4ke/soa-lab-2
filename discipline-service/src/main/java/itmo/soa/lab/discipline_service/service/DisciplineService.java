@@ -3,7 +3,6 @@ package itmo.soa.lab.discipline_service.service;
 import java.util.Comparator;
 import org.springframework.stereotype.Service;
 
-import itmo.soa.lab.discipline_service.LabworkClient;
 import itmo.soa.lab.discipline_service.model.dto.Labwork;
 import itmo.soa.lab.discipline_service.exception.ApiException;
 import itmo.soa.lab.discipline_service.model.dto.Discipline;

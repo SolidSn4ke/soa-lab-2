@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import itmo.soa.lab.discipline_service.model.dto.ErrorMsg;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,7 +28,7 @@ public class GlobalExceptionHandler {
         return error(500, "An internal server error occurred while processing the request");
     }
 
-    private ResponseEntity<ErrorMsg> error(int status, String detail) {
+    private ResponseEntity<ErrorMsg> error(Integer status, String detail) {
         String message = switch (status) {
             case 400 -> "Bad Request";
             case 404 -> "Not Found";
@@ -40,10 +37,5 @@ public class GlobalExceptionHandler {
         };
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_XML)
                 .body(new ErrorMsg(message, Instant.now().toString(), List.of(detail)));
-    }
-
-    @JsonRootName("ErrorMsg")
-    public record ErrorMsg(String msg, String timestamp,
-            @JacksonXmlElementWrapper(localName = "details") @JacksonXmlProperty(localName = "detail") List<String> details) {
     }
 }

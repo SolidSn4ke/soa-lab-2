@@ -1,14 +1,13 @@
 package itmo.soa.lab.discipline_service.exception;
 
-public class ApiException extends RuntimeException {
-    private final int status;
+import lombok.Getter;
 
-    public ApiException(int status, String message) {
+@Getter
+public class ApiException extends RuntimeException {
+    private final Integer status;
+
+    public ApiException(Integer status, String message) {
         super(message);
         this.status = status;
-    }
-
-    public int getStatus() {
-        return status;
     }
 }
