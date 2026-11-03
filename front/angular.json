@@ -71,6 +71,25 @@
               ],
               "outputHashing": "all"
             },
+            "helios": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/constants/api.constants.ts",
+                  "with": "src/app/constants/api.constants.helios.ts"
+                }
+              ],
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "public"
+                },
+                {
+                  "glob": "labwork.php",
+                  "input": "deploy/helios",
+                  "output": "api"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
