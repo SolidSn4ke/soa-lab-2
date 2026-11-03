@@ -20,16 +20,16 @@ import org.springframework.web.client.RestClientResponseException;
 
 @Component
 public class LabworkClient {
-    @Value("${labwork-service.base-url}")
-    String baseUrl;
+    private final RestClient client;
 
-    private final RestClient client = RestClient
-            .builder()
-            .baseUrl(baseUrl)
-            .defaultHeader("Accept", MediaType.APPLICATION_XML_VALUE)
-            .configureMessageConverters(
-                    converters -> converters.withXmlConverter(new JacksonXmlHttpMessageConverter()))
-            .build();
+    public LabworkClient(@Value("${labwork-service.base-url}") String baseUrl) {
+        this.client = RestClient.builder()
+                .baseUrl(baseUrl)
+                .defaultHeader("Accept", MediaType.APPLICATION_XML_VALUE)
+                .configureMessageConverters(converters -> converters.withXmlConverter(
+                        new JacksonXmlHttpMessageConverter()))
+                .build();
+    }
 
     public Discipline getDiscipline(String id) {
         return call(() -> required(client.get().uri("/disciplines/{id}", id)
