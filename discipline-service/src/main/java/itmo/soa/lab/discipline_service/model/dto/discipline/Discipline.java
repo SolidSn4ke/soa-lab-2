@@ -1,4 +1,4 @@
-package itmo.soa.lab.discipline_service.model.dto;
+package itmo.soa.lab.discipline_service.model.dto.discipline;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonRootName;

@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import itmo.soa.lab.discipline_service.model.dto.Discipline;
+import itmo.soa.lab.discipline_service.model.dto.discipline.Discipline;
 import itmo.soa.lab.discipline_service.service.DisciplineService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 @RequestMapping(value = "/bars/discipline/{discipline-id}", produces = MediaType.APPLICATION_XML_VALUE)
 public class DisciplineController {
     private final DisciplineService service;

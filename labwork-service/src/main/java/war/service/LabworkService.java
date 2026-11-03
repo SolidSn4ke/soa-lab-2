@@ -114,4 +114,20 @@ public class LabworkService {
             labworkRepo.delete(list.get(0));
         }
     }
+
+    @Transactional
+    public void batchAssign(String disciplineId, List<Integer> labworkIds) {
+        DisciplineEntity discipline = disciplineRepo.findById(disciplineId)
+                .orElseThrow(() -> new HttpStatusException(Status.NOT_FOUND,
+                        List.of(String.format("Discipline '%s' was not found", disciplineId))));
+        List<LabworkEntity> labworks = labworkRepo.findByIds(labworkIds, Limit.of(labworkIds.size()));
+        if (labworks.size() != labworkIds.size()) {
+            throw new HttpStatusException(Status.NOT_FOUND,
+                    List.of("Some labworks were not found"));
+        }
+        for (LabworkEntity labwork : labworks) {
+            labwork.setDiscipline(discipline);
+            labworkRepo.update(labwork);
+        }
+    }
 }

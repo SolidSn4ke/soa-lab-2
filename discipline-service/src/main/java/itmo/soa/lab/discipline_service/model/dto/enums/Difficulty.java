@@ -1,4 +1,4 @@
-package itmo.soa.lab.discipline_service.model.dto;
+package itmo.soa.lab.discipline_service.model.dto.enums;
 
 public enum Difficulty {
     EASY, NORMAL, VERY_HARD, IMPOSSIBLE, HOPELESS
