@@ -18,6 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 import war.model.dto.GetResourceRequestParams;
 import war.model.dto.PageInfo;
 import war.model.dto.enums.Difficulty;
+import war.model.dto.labworks.BatchAssignRequestBody;
 import war.model.dto.labworks.CreateLabworkRequest;
 import war.model.dto.labworks.LabworkDto;
 import war.model.dto.labworks.PatchLabworkRequest;
@@ -77,5 +78,12 @@ public class LabworkController {
     @Produces(MediaType.APPLICATION_XML)
     public void deleteLabworkById(@PathParam(value = "id") Integer id) {
         labworkService.delete(id);
+    }
+
+    @POST
+    @Path("/batch")
+    @Consumes(MediaType.APPLICATION_XML)
+    public void batchAssign(@Valid BatchAssignRequestBody req) {
+        labworkService.batchAssign(req.getDisciplineId(), req.getLabworkIds());
     }
 }

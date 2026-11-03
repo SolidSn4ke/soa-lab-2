@@ -18,6 +18,9 @@ public interface LabworkRepository extends CrudRepository<LabworkEntity, Integer
     @Query("select l from LabworkEntity l join fetch l.discipline where l.id = :id")
     Optional<LabworkEntity> findById(Integer id);
 
+    @Query("select l from LabworkEntity l join fetch l.discipline where l.id in :ids")
+    List<LabworkEntity> findByIds(List<Integer> ids, Limit limit);
+
     @Query("update LabworkEntity l set l.discipline = :newDiscipline where l.discipline.name = :oldName")
     int reassignDiscipline(String oldName, DisciplineEntity newDiscipline);
 
