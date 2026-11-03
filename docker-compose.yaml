@@ -34,6 +34,10 @@ services:
     image: labwork-service:local
     ports:
       - 42700:8443
+    environment:
+      DB_URL: ${DB_URL:-jdbc:postgresql://pg:5432/labworks}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
     volumes:
       - type: bind
         source: ./docker/wildfly/configuration
@@ -49,10 +53,11 @@ services:
     ports:
       - 5433:5432
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=labworks
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      POSTGRES_DB: ${DB_NAME:-labworks}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d labworks" ]
+      test: [ "CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\"" ]
       interval: 5s
       timeout: 5s
       retries: 10
