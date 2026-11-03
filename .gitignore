@@ -5,4 +5,8 @@
 .DS_Store
 
 # Docker
+.env
+.env.*
+!.env.example
 /docker/wildfly/configuration
+/docker/jetty/tls/

@@ -1,4 +1,4 @@
-FROM maven:3.9-eclipse-temurin-25 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN mvn --batch-mode --no-transfer-progress dependency:go-offline
 COPY src ./src
 RUN mvn --batch-mode --no-transfer-progress clean package
 
-FROM quay.io/wildfly/wildfly:41.0.1.Final-jdk25
+FROM quay.io/wildfly/wildfly:41.0.1.Final-jdk21
 
 COPY --from=build --chown=jboss:root /app/target/labwork-service.war \
     /opt/jboss/wildfly/standalone/deployments/labwork-service.war
