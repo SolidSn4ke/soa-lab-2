@@ -1,0 +1,7 @@
+{
+    "name": "discipline-service-deploy",
+    "private": true,
+    "scripts": {
+        "deploy:helios": "node scripts/deploy-helios.mjs"
+    }
+}
