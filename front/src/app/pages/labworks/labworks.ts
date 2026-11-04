@@ -169,12 +169,24 @@ export class Labworks implements OnInit {
   }
 
   public onRemoveByDifficultyClick(): void {
+    console.log('Selected difficulty:', this.difficulty);
+
     if (!this.difficulty) {
       this.showDifficultyError = true;
       return;
     }
 
     this.showDifficultyError = false;
-    this.labworkService.removeByDifficulty(this.difficulty);
+
+    this.labworkService.removeByDifficulty(this.difficulty)
+      .subscribe({
+        next: () => {
+          console.log('Delete successful:');
+          this.loadLabworks();
+        },
+        error: (error) => {
+          console.error("Delete error:", error);
+        }
+      });
   }
 }
