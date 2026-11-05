@@ -30,7 +30,6 @@ public class DisciplineQueryRepository {
         Root<DisciplineEntity> root = cq.from(DisciplineEntity.class);
 
         List<Order> order = new ArrayList<>();
-        List<Predicate> predicates = new ArrayList<>();
 
         sort.forEach(e -> {
             e.trim();
@@ -43,6 +42,22 @@ public class DisciplineQueryRepository {
             }
         });
 
+        cq.orderBy(order);
+        cq.where(predicates(cb, root, filters));
+        return em.createQuery(cq).setFirstResult(page * size).setMaxResults(size).getResultList();
+    }
+
+    public long count(List<String> filters) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<DisciplineEntity> root = query.from(DisciplineEntity.class);
+        query.select(cb.count(root));
+        query.where(predicates(cb, root, filters));
+        return em.createQuery(query).getSingleResult();
+    }
+
+    private List<Predicate> predicates(CriteriaBuilder cb, Root<DisciplineEntity> root, List<String> filters) {
+        List<Predicate> predicates = new ArrayList<>();
         filters.forEach(e -> {
             Matcher matcher = FILTER_PATTERN.matcher(e.trim());
 
@@ -90,8 +105,6 @@ public class DisciplineQueryRepository {
             }
         });
 
-        cq.orderBy(order);
-        cq.where(predicates);
-        return em.createQuery(cq).setFirstResult(page * size).setMaxResults(size).getResultList();
+        return predicates;
     }
 }
