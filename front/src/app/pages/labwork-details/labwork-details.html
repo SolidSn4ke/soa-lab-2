@@ -4,7 +4,7 @@
         <app-labwork-form [labwork]="labworkDetails()" (saved)="onLabworkSaved()" (closed)="closeForm()" />
         }
 
-        @if (!labworkDetails()){
+        @if (!labworkDetails() || isLoading()) {
         <div class="loading">
             <span class="loading__circle"></span>
             <span class="loading__text small-text">

@@ -1,8 +1,9 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { Discipline } from '../../interfaces/Discipline';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DisciplineService } from '../../services/discipline.service';
 import { DisciplineForm } from '../../components/discipline-form/discipline-form';
+import { Subject, timer, merge, switchMap, takeUntil, catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
   imports: [DisciplineForm],
@@ -10,32 +11,59 @@ import { DisciplineForm } from '../../components/discipline-form/discipline-form
   styleUrl: './discipline-details.scss',
   templateUrl: './discipline-details.html',
 })
-export class DisciplineDetails {
+export class DisciplineDetails implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  private readonly refresh$ = new Subject<void>();
+  private readonly pollingInterval = 10_000;
+
   public disciplineDetails: WritableSignal<Discipline | null> = signal(null);
+  public isLoading: WritableSignal<boolean> = signal(false);
 
   public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly disciplineService: DisciplineService) { }
 
   public ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+
     if (!id) {
       console.error('discipline id is null');
+      this.router.navigate(['/not-found']);
       return;
     }
-    this.loadDisciplineDetails(id);
+
+    merge(
+      timer(0, this.pollingInterval),
+      this.refresh$
+    )
+      .pipe(
+        switchMap(() => {
+          this.isLoading.set(true);
+
+          return this.disciplineService.getById(id).pipe(
+            catchError((error) => {
+              console.error('Error loading discipline details:', error);
+              return EMPTY;
+            }),
+            finalize(() => this.isLoading.set(false))
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (discipline) => {
+          this.disciplineDetails.set(discipline);
+        }
+      });
   }
 
-  public loadDisciplineDetails(id: string): void {
-    this.disciplineService.getById(id).subscribe({
-      next: (discipline) => {
-        this.disciplineDetails.set(discipline);
-      },
-      error: (error) => {
-        console.error('Error loading discipline details:', error);
-        this.router.navigate(['/not-found']);
-      }
-    });
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.refresh$.complete();
   }
 
+  public loadDisciplineDetails(): void {
+    this.refresh$.next();
+  }
 
   public isFormOpen: boolean = false;
 
@@ -45,11 +73,7 @@ export class DisciplineDetails {
 
   public onDisciplineSaved(): void {
     this.closeForm();
-    const discipline = this.disciplineDetails();
-
-    if (discipline) {
-      this.loadDisciplineDetails(discipline.name);
-    }
+    this.loadDisciplineDetails();
   }
 
   public onEditClick(): void {

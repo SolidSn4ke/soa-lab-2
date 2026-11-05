@@ -4,7 +4,7 @@
         <app-discipline-form [discipline]="disciplineDetails()" (saved)="onDisciplineSaved()" (closed)="closeForm()" />
         }
 
-        @if (!disciplineDetails()){
+        @if (!disciplineDetails() || isLoading()) {
         <div class="loading">
             <span class="loading__circle"></span>
             <span class="loading__text small-text">
