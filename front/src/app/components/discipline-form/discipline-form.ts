@@ -23,7 +23,7 @@ export class DisciplineForm implements OnChanges {
   public constructor(private formBuilder: FormBuilder, private disciplineService: DisciplineService) {
     this.form = this.formBuilder.nonNullable.group({
       name: ['', [Validators.required]],
-      labsCount: [0, [Validators.required]],
+      labsCount: ['', [Validators.required]],
     });
   }
 
@@ -32,7 +32,7 @@ export class DisciplineForm implements OnChanges {
     if (changes['discipline']) {
       this.form.reset({
         name: this.discipline?.name ?? '',
-        labsCount: this.discipline?.labsCount ?? 0,
+        labsCount: this.discipline?.labsCount ?? '',
       });
     }
   }

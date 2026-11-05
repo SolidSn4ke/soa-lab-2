@@ -5,7 +5,7 @@
 
     <form class="default-text form" [formGroup]="form" (ngSubmit)="onSubmit()">
         <label for="name">Name:</label>
-        <input id="name" type="text" formControlName="name"
+        <input id="name" type="text" formControlName="name" placeholder="Enter labwork name"
             [class.input--error]="form.get('name')?.invalid && form.get('name')?.touched" />
 
         @if (form.get('name')?.hasError('required') && form.get('name')?.touched){
@@ -14,14 +14,14 @@
 
         <div class="form-group" formGroupName="coordinates">
             <label for="coordinates-x">X Coordinate:</label>
-            <input id="coordinates-x" type="number" formControlName="x"
+            <input id="coordinates-x" type="number" formControlName="x" placeholder="Enter X coordinate"
                 [class.input--error]="form.get('coordinates.x')?.invalid && form.get('coordinates.x')?.touched" />
             @if (form.get('coordinates.x')?.invalid && form.get('coordinates.x')?.touched) {
             <span class="error small-text form__error">X is required</span>
             }
 
             <label for="coordinates-y">Y Coordinate:</label>
-            <input id="coordinates-y" type="number" formControlName="y"
+            <input id="coordinates-y" type="number" formControlName="y" placeholder="Enter Y coordinate"
                 [class.input--error]="form.get('coordinates.y')?.invalid && form.get('coordinates.y')?.touched" />
             @if (form.get('coordinates.y')?.invalid && form.get('coordinates.y')?.touched) {
             <span class="error small-text form__error">Y is required</span>
@@ -29,7 +29,7 @@
         </div>
 
         <label for="minimalPoint">Minimal Point:</label>
-        <input id="minimalPoint" formControlName="minimalPoint" type="number"
+        <input id="minimalPoint" formControlName="minimalPoint" type="number" placeholder="Enter minimal point"
             [class.input--error]="form.get('minimalPoint')?.invalid && form.get('minimalPoint')?.touched" />
 
         @if (form.get('minimalPoint')?.hasError('required') && form.get('minimalPoint')?.touched){
@@ -39,7 +39,7 @@
         }
 
         <label for="averagePoint">Average Point:</label>
-        <input id="averagePoint" formControlName="averagePoint" type="number"
+        <input id="averagePoint" formControlName="averagePoint" type="number" placeholder="Enter average point"
             [class.input--error]="form.get('averagePoint')?.invalid && form.get('averagePoint')?.touched" />
 
         @if (form.get('averagePoint')?.hasError('required') && form.get('averagePoint')?.touched){
@@ -75,7 +75,7 @@
         }
 
         @if (errorMessage){
-        <p>{{errorMessage}}</p>
+        <p class="error small-text">{{errorMessage}}</p>
         }
 
         <div class="form__actions">
