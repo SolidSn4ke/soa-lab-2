@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Only these applications' HTTP listeners are exposed by the gateway.
 const LABWORK_BACKEND = 'http://127.0.0.1:41999/labwork-service';
-const DISCIPLINE_BACKEND = 'http://127.0.0.1:42792/api';
+const DISCIPLINE_BACKEND = 'http://127.0.0.1:42792/discipline-service';
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
 const MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
 
