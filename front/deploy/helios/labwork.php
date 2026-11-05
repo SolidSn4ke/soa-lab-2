@@ -3,9 +3,29 @@ declare(strict_types=1);
 
 // Only these applications' HTTP listeners are exposed by the gateway.
 const LABWORK_BACKEND = 'http://127.0.0.1:41999/labwork-service';
-const DISCIPLINE_BACKEND = 'http://127.0.0.1:42792/discipline-service';
+const DISCIPLINE_BACKEND = 'https://127.0.0.1:42792/discipline-service';
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
 const MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
+
+const LOG_FILE = __DIR__ . '/gateway.log';
+
+function writeLog(string $message): void
+{
+    $date = date('Y-m-d H:i:s');
+
+    $result = @file_put_contents(
+        LOG_FILE,
+        "[$date] $message" . PHP_EOL,
+        FILE_APPEND | LOCK_EX
+    );
+
+    if ($result === false) {
+        error_log(
+            'Gateway logging failed. File: ' . LOG_FILE .
+            '; Directory writable: ' . (is_writable(__DIR__) ? 'yes' : 'no')
+        );
+    }
+}
 
 function fail(int $status, string $message): never
 {
@@ -15,6 +35,16 @@ function fail(int $status, string $message): never
     echo $message;
     exit;
 }
+
+writeLog('Gateway script started. Directory: ' . __DIR__);
+
+$sslContext = [
+    'verify_peer' => true,
+    'verify_peer_name' => true,
+    'peer_name' => 'localhost',
+    'allow_self_signed' => true,
+    'cafile' => __DIR__ . '/certs/jetty.crt',
+];
 
 $method = $_SERVER['REQUEST_METHOD'];
 // Helios blocks PUT/PATCH/DELETE before PHP runs. The frontend sends POST
@@ -38,8 +68,10 @@ if (!is_string($requestPath) || !str_starts_with($requestPath, $scriptPath . '/'
 }
 $path = substr($requestPath, strlen($scriptPath));
 $decodedPath = rawurldecode($path);
-if (preg_match('/[\x00-\x20\x7f\\\\?#]/', $decodedPath)
-    || preg_match('~(?:^|/)\.{1,2}(?:/|$)~', $decodedPath)) {
+if (
+    preg_match('/[\x00-\x20\x7f\\\\?#]/', $decodedPath)
+    || preg_match('~(?:^|/)\.{1,2}(?:/|$)~', $decodedPath)
+) {
     fail(400, 'Invalid API path');
 }
 if (preg_match('~^/(?:labworks|disciplines)(?:/|$)~', $decodedPath)) {
@@ -61,8 +93,11 @@ if (strlen($body) > MAX_REQUEST_BYTES) {
 }
 
 $requestHeaders = ['Connection: close'];
-foreach (['CONTENT_TYPE' => 'Content-Type', 'HTTP_ACCEPT' => 'Accept',
-    'HTTP_AUTHORIZATION' => 'Authorization'] as $variable => $name) {
+foreach ([
+    'CONTENT_TYPE' => 'Content-Type',
+    'HTTP_ACCEPT' => 'Accept',
+    'HTTP_AUTHORIZATION' => 'Authorization'
+] as $variable => $name) {
     $value = $_SERVER[$variable] ?? '';
     if ($value !== '' && !preg_match('/[\r\n]/', $value)) {
         $requestHeaders[] = $name . ': ' . $value;
@@ -74,19 +109,43 @@ if ($body !== '' || in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
 
 $query = $_SERVER['QUERY_STRING'] ?? '';
 $url = $backend . $path . ($query === '' ? '' : '?' . $query);
-$context = stream_context_create(['http' => [
-    'method' => $method,
-    'header' => $requestHeaders,
-    'content' => $body,
-    'protocol_version' => 1.1,
-    'ignore_errors' => true,
-    'follow_location' => 0,
-    'timeout' => 15,
-]]);
+$context = stream_context_create([
+    'http' => [
+        'method' => $method,
+        'header' => $requestHeaders,
+        'content' => $body,
+        'protocol_version' => 1.1,
+        'ignore_errors' => true,
+        'follow_location' => 0,
+        'timeout' => 15,
+    ],
+    'ssl' => $sslContext,
+]);
 
 $upstream = @fopen($url, 'rb', false, $context);
+
 if ($upstream === false) {
-    error_log('API gateway (' . $service . '): ' . (error_get_last()['message'] ?? 'connection failed'));
+    $error = error_get_last();
+
+    writeLog(
+        'ERROR | ' . $service .
+        ' | ' . $method .
+        ' ' . $url .
+        ' | ' . ($error['message'] ?? 'connection failed')
+    );
+
+    // Log detailed OpenSSL errors.
+    while (($sslError = openssl_error_string()) !== false) {
+        writeLog('OPENSSL | ' . $sslError);
+    }
+
+    writeLog(
+        'SSL CONFIG | certificate exists: ' .
+        (is_file(__DIR__ . '/certs/jetty.crt') ? 'yes' : 'no') .
+        ' | certificate readable: ' .
+        (is_readable(__DIR__ . '/certs/jetty.crt') ? 'yes' : 'no')
+    );
+
     fail(502, 'Cannot connect to ' . $service);
 }
 $responseBody = stream_get_contents($upstream, MAX_RESPONSE_BYTES + 1);
@@ -107,13 +166,29 @@ foreach ($metadata['wrapper_data'] ?? [] as $line) {
         $responseHeaders = [];
     } elseif (str_contains($line, ':')) {
         [$name, $value] = explode(':', $line, 2);
-        if (in_array(strtolower($name), ['content-type', 'cache-control', 'etag',
-            'last-modified', 'allow', 'retry-after', 'www-authenticate'], true)) {
+        if (
+            in_array(strtolower($name), [
+                'content-type',
+                'cache-control',
+                'etag',
+                'last-modified',
+                'allow',
+                'retry-after',
+                'www-authenticate'
+            ], true)
+        ) {
             $responseHeaders[] = $name . ': ' . trim($value);
         }
     }
 }
 if ($status < 200 || $status > 599) {
+    writeLog(
+        'INFO | ' . $service .
+        ' | ' . $method .
+        ' ' . $url .
+        ' | HTTP ' . $status
+    );
+
     fail(502, 'Invalid HTTP response from ' . $service);
 }
 http_response_code($status);

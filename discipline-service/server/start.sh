@@ -16,4 +16,6 @@ export _JAVA_OPTIONS="-XX:MaxHeapSize=2G -XX:MaxMetaspaceSize=512m"
 
 cd "$JETTY_BASE"
 
-exec java -jar "$JETTY_HOME/start.jar"
+exec java \
+    -Djetty.sslContext.keyStorePassword="$JETTY_SSL_PASSWORD" \
+    -jar "$JETTY_HOME/start.jar"

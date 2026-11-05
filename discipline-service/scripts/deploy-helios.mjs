@@ -29,6 +29,8 @@ const {
     JETTY_BASE,
     JETTY_PORT,
     JETTY_DEPLOY_MODULES,
+    JETTY_SSL_KEYSTORE,
+    JETTY_SSL_PASSWORD,
     LABWORK_SERVICE_URL,
 } = process.env;
 
@@ -41,6 +43,8 @@ const requiredVariables = {
     JETTY_BASE,
     JETTY_PORT,
     JETTY_DEPLOY_MODULES,
+    JETTY_SSL_KEYSTORE,
+    JETTY_SSL_PASSWORD,
     LABWORK_SERVICE_URL,
 };
 
@@ -79,6 +83,28 @@ function run(command, args, options = {}) {
     }
 }
 
+function runRemoteScript(script) {
+    console.log(`\n> ssh -p ${SSH_PORT} ${SSH_TARGET} bash -s`);
+
+    const result = spawnSync(
+        'ssh',
+        ['-p', SSH_PORT, SSH_TARGET, 'bash -s'],
+        {
+            cwd: PROJECT_DIR,
+            input: script,
+            stdio: ['pipe', 'inherit', 'inherit'],
+        }
+    );
+
+    if (result.error) {
+        throw result.error;
+    }
+
+    if (result.status !== 0) {
+        throw new Error('Remote script execution failed');
+    }
+}
+
 function shellQuote(value) {
     return `'${String(value).replace(/'/g, "'\\''")}'`;
 }
@@ -111,6 +137,8 @@ JETTY_HOME=${shellQuote(JETTY_HOME)}
 JETTY_BASE=${shellQuote(JETTY_BASE)}
 JETTY_PORT=${shellQuote(JETTY_PORT)}
 JETTY_DEPLOY_MODULES=${shellQuote(JETTY_DEPLOY_MODULES)}
+JETTY_SSL_KEYSTORE=${shellQuote(JETTY_SSL_KEYSTORE)}
+JETTY_SSL_PASSWORD=${shellQuote(JETTY_SSL_PASSWORD)}
 
 mkdir -p "$REMOTE_DIR"
 mkdir -p "$JETTY_BASE"
@@ -123,20 +151,114 @@ fi
 mkdir -p "$JETTY_BASE/webapps"
 mkdir -p "$JETTY_BASE/logs"
 
+# Limit memory for Java configuration commands
+export _JAVA_OPTIONS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=256m"
+
 cd "$JETTY_BASE"
 
-java -jar "$JETTY_HOME/start.jar" \\
-    --add-modules="http,$JETTY_DEPLOY_MODULES"
+mkdir -p "$JETTY_BASE/etc"
+mkdir -p "$JETTY_BASE/start.d"
+mkdir -p "$JETTY_BASE/webapps"
+mkdir -p "$JETTY_BASE/logs"
 
-cat > "$JETTY_BASE/start.d/http.ini" <<EOF
---module=http
-jetty.http.port=$JETTY_PORT
+# Enable SSL and HTTPS modules
+java -jar "$JETTY_HOME/start.jar" \
+    --add-modules="ssl,https,$JETTY_DEPLOY_MODULES"
+
+# Generate a test keystore if it does not exist
+case "$JETTY_SSL_KEYSTORE" in
+    /*)
+        echo "JETTY_SSL_KEYSTORE must be relative to JETTY_BASE"
+        exit 1
+        ;;
+esac
+
+KEYSTORE_PATH="$JETTY_BASE/$JETTY_SSL_KEYSTORE"
+
+mkdir -p "$(dirname "$KEYSTORE_PATH")"
+
+if [ ! -f "$KEYSTORE_PATH" ]; then
+    echo "Generating self-signed test certificate..."
+
+    keytool -genkeypair \
+        -alias jetty \
+        -keyalg RSA \
+        -keysize 2048 \
+        -validity 365 \
+        -storetype PKCS12 \
+        -keystore "$KEYSTORE_PATH" \
+        -storepass "$JETTY_SSL_PASSWORD" \
+        -keypass "$JETTY_SSL_PASSWORD" \
+        -dname "CN=localhost" \
+        -ext "SAN=dns:localhost,ip:127.0.0.1" \
+        -noprompt
+fi
+
+chmod 600 "$KEYSTORE_PATH"
+
+# Export public certificate for the PHP API gateway
+CERT_DIR="$REMOTE_DIR/certs"
+CERT_FILE="$CERT_DIR/jetty.crt"
+
+mkdir -p "$CERT_DIR"
+
+echo "Exporting Jetty public certificate..."
+
+keytool -exportcert \
+    -alias jetty \
+    -keystore "$KEYSTORE_PATH" \
+    -storetype PKCS12 \
+    -storepass "$JETTY_SSL_PASSWORD" \
+    -rfc \
+    -file "$CERT_FILE"
+
+chmod 644 "$CERT_FILE"
+
+echo "Certificate exported to: $CERT_FILE"
+
+# Configure HTTPS connector
+cat > "$JETTY_BASE/start.d/ssl.ini" <<EOF
+--module=ssl
+jetty.ssl.host=0.0.0.0
+jetty.ssl.port=$JETTY_PORT
 EOF
 
-cat > "$REMOTE_DIR/jetty.env" <<EOF
-JETTY_HOME=$JETTY_HOME
-JETTY_BASE=$JETTY_BASE
+cat > "$JETTY_BASE/start.d/https.ini" <<EOF
+--module=https
 EOF
+
+# Jetty 12.1 has a separate ssl-context module
+if [ -f "$JETTY_BASE/start.d/ssl-context.ini" ]; then
+    cat > "$JETTY_BASE/start.d/ssl-context.ini" <<EOF
+--module=ssl-context
+jetty.sslContext.keyStorePath=$JETTY_SSL_KEYSTORE
+jetty.sslContext.keyStoreType=PKCS12
+EOF
+else
+    # Jetty 12.0
+    cat >> "$JETTY_BASE/start.d/ssl.ini" <<EOF
+jetty.sslContext.keyStorePath=$JETTY_SSL_KEYSTORE
+jetty.sslContext.keyStoreType=PKCS12
+EOF
+fi
+
+# Ensure that no HTTP connector is enabled
+if grep -R -nE '^[[:space:]]*--module=http([[:space:]]|$)' \
+    "$JETTY_BASE/start.d" "$JETTY_BASE/start.ini" 2>/dev/null; then
+    echo "HTTP module is still enabled. Check Jetty configuration."
+    exit 1
+fi
+
+# Save environment variables for start.sh
+umask 077
+
+{
+    printf 'JETTY_HOME=%q\n' "$JETTY_HOME"
+    printf 'JETTY_BASE=%q\n' "$JETTY_BASE"
+    printf 'JETTY_SSL_PASSWORD=%q\n' "$JETTY_SSL_PASSWORD"
+} > "$REMOTE_DIR/jetty.env"
+
+chmod 600 "$REMOTE_DIR/jetty.env"
 
 cat > "$REMOTE_DIR/application.env" <<EOF
 LABWORK_SERVICE_URL=${shellQuote(LABWORK_SERVICE_URL)}
@@ -145,11 +267,7 @@ EOF
 echo "Jetty configuration completed."
 `;
 
-    run('ssh', [
-        '-p', SSH_PORT,
-        SSH_TARGET,
-        `bash -lc ${shellQuote(remoteScript)}`,
-    ]);
+    runRemoteScript(remoteScript);
 }
 
 // Step 3. Upload files
