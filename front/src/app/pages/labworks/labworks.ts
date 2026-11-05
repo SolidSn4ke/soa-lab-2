@@ -123,19 +123,15 @@ export class Labworks implements OnInit {
       rule => rule.field === field
     );
 
-    const direction = currentRule?.direction === 'asc' ? 'desc' : 'asc';
-    if (currentRule) {
-      this.sortRules.forEach(
-        rule => {
-          if (rule === currentRule) {
-            rule.direction = direction;
-          }
-        }
-      )
+    if (!currentRule) {
+      this.sortRules.push({ field, direction: 'asc' });
+    } else if (currentRule.direction === 'asc') {
+      currentRule.direction = 'desc';
     } else {
-      this.sortRules.push({ field, direction });
+      this.sortRules = this.sortRules.filter(
+        rule => rule.field !== field
+      );
     }
-
 
     this.currentPage = 0;
     this.loadLabworks();
