@@ -3,6 +3,7 @@ package war.exception;
 import java.time.Instant;
 import java.util.List;
 import jakarta.data.exceptions.OptimisticLockingFailureException;
+import jakarta.ejb.EJBException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import jakarta.ws.rs.WebApplicationException;
@@ -34,7 +35,9 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception>, Featu
 
     @Override
     public Response toResponse(Exception ex) {
-        System.out.println(ex);
+        while (ex instanceof EJBException && ex.getCause() instanceof Exception cause && cause != ex) {
+            ex = cause;
+        }
 
         if (ex instanceof WebApplicationException httpException) {
             Response original = httpException.getResponse();
@@ -59,8 +62,8 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception>, Featu
         }
 
         if (ex instanceof UnmarshalException e) {
-            Throwable cause = e.getLinkedException();
-            return response(Status.BAD_REQUEST, List.of(cause.getMessage()));
+            Throwable linkedCause = e.getLinkedException();
+            return response(Status.BAD_REQUEST, List.of(linkedCause.getMessage()));
         }
 
         if (ex instanceof OptimisticLockingFailureException) {
