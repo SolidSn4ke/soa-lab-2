@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Labwork } from '../../interfaces/Labwork';
 import { LabworkService } from '../../services/labwork.service';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { Pagination } from '../../components/pagination/pagination';
 import { FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
-import { finalize } from 'rxjs';
+import { Subject, timer, switchMap, takeUntil, tap, finalize, merge, catchError, EMPTY } from 'rxjs';
 import { FilterField } from '../../interfaces/FilterField';
 
 @Component({
@@ -21,7 +21,7 @@ import { FilterField } from '../../interfaces/FilterField';
   styleUrl: './labworks.scss',
   templateUrl: './labworks.html',
 })
-export class Labworks implements OnInit {
+export class Labworks implements OnInit, OnDestroy {
   public labworks: Labwork[] = [];
 
   public currentPage: number = 0;
@@ -57,36 +57,59 @@ export class Labworks implements OnInit {
     { value: 'discipline.name', label: 'Discipline', type: 'string' },
   ];
 
+  private readonly destroy$ = new Subject<void>();
+  private readonly refresh$ = new Subject<void>();
+
+  private readonly pollingInterval = 10_000;
+
   public constructor(private labworkService: LabworkService, private router: Router) { }
 
   public ngOnInit(): void {
-    this.loadLabworks();
-  }
+    merge(
+      timer(0, this.pollingInterval),
+      this.refresh$
+    )
+      .pipe(
+        switchMap(() => {
+          this.isLoading.set(true);
 
-  public loadLabworks(): void {
-    this.isLoading.set(true);
+          const sort = buildSortParams(this.sortRules);
+          const search = buildSearchParams(this.filters);
 
-    const sort = buildSortParams(this.sortRules);
-    const search = buildSearchParams(this.filters);
-
-    this.labworkService.getLabworks(this.currentPage, this.pageSize, sort, search)
-      .pipe(finalize(() => {
-        this.isLoading.set(false);
-      }))
+          return this.labworkService.getLabworks(
+            this.currentPage,
+            this.pageSize,
+            sort,
+            search
+          ).pipe(
+            catchError((error) => {
+              console.error('Ошибка загрузки:', error);
+              return EMPTY;
+            }),
+            finalize(() => this.isLoading.set(false))
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
       .subscribe({
         next: (pageInfo) => {
-          console.log("Получены данные:", pageInfo);
-
           this.labworks = pageInfo.items;
           this.currentPage = pageInfo.page;
           this.pageSize = pageInfo.size;
           this.totalPages = pageInfo.totalPages;
           this.totalElements = pageInfo.totalElements;
-        },
-        error: (error) => {
-          console.error("Ошибка загрузки:", error);
         }
       });
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.refresh$.complete();
+  }
+
+  public loadLabworks(): void {
+    this.refresh$.next();
   }
 
   public goToPage(page: number): void {
