@@ -45,6 +45,7 @@ export class Labworks implements OnInit {
     { value: 'difficulty', label: 'Difficulty' },
     { value: 'minimalPoint', label: 'Minimal Point' },
     { value: 'averagePoint', label: 'Average Point' },
+    { value: 'creationDate', label: 'Creation Date' },
     { value: 'discipline.name', label: 'Discipline' },
   ];
 
