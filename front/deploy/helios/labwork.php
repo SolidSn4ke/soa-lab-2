@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
-
-// Only these applications' HTTP listeners are exposed by the gateway.
-const LABWORK_BACKEND = 'http://127.0.0.1:41999/labwork-service';
 const DISCIPLINE_BACKEND = 'https://127.0.0.1:42792/discipline-service';
+const LABWORK_BACKEND = 'https://127.0.0.1:42700/labwork-service';
+const LABWORK_CERT_SHA256 = 'b9f1afb32a3a961279c12e7edb1c811faa94eb61613818fe01446ad954081580';
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
 const MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
 
@@ -38,14 +37,6 @@ function fail(int $status, string $message): never
 
 writeLog('Gateway script started. Directory: ' . __DIR__);
 
-$sslContext = [
-    'verify_peer' => true,
-    'verify_peer_name' => true,
-    'peer_name' => 'localhost',
-    'allow_self_signed' => true,
-    'cafile' => __DIR__ . '/certs/jetty.crt',
-];
-
 $method = $_SERVER['REQUEST_METHOD'];
 // Helios blocks PUT/PATCH/DELETE before PHP runs. The frontend sends POST
 // with this header; only the gateway restores the backend HTTP method.
@@ -77,9 +68,23 @@ if (
 if (preg_match('~^/(?:labworks|disciplines)(?:/|$)~', $decodedPath)) {
     $backend = LABWORK_BACKEND;
     $service = 'labwork-service';
+    // Trust the exact self-signed WildFly certificate, independently of Jetty.
+    // Update the pin if WildFly regenerates application.keystore.
+    $sslContext = [
+        'verify_peer' => false,
+        'verify_peer_name' => false,
+        'peer_fingerprint' => ['sha256' => LABWORK_CERT_SHA256],
+    ];
 } elseif (str_starts_with($decodedPath, '/bars/discipline/')) {
     $backend = DISCIPLINE_BACKEND;
     $service = 'discipline-service';
+    $sslContext = [
+        'verify_peer' => true,
+        'verify_peer_name' => true,
+        'peer_name' => 'localhost',
+        'allow_self_signed' => true,
+        'cafile' => __DIR__ . '/certs/jetty.crt',
+    ];
 } else {
     fail(404, 'Unknown API resource');
 }
@@ -139,12 +144,16 @@ if ($upstream === false) {
         writeLog('OPENSSL | ' . $sslError);
     }
 
-    writeLog(
-        'SSL CONFIG | certificate exists: ' .
-        (is_file(__DIR__ . '/certs/jetty.crt') ? 'yes' : 'no') .
-        ' | certificate readable: ' .
-        (is_readable(__DIR__ . '/certs/jetty.crt') ? 'yes' : 'no')
-    );
+    if (isset($sslContext['cafile'])) {
+        writeLog(
+            'SSL CONFIG | ' . $service . ' | certificate exists: ' .
+            (is_file($sslContext['cafile']) ? 'yes' : 'no') .
+            ' | certificate readable: ' .
+            (is_readable($sslContext['cafile']) ? 'yes' : 'no')
+        );
+    } else {
+        writeLog('SSL CONFIG | ' . $service . ' | SHA-256 pin: ' . LABWORK_CERT_SHA256);
+    }
 
     fail(502, 'Cannot connect to ' . $service);
 }
