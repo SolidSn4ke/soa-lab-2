@@ -18,6 +18,8 @@ export class LabworkDetails implements OnInit, OnDestroy {
 
   public isLoading: WritableSignal<boolean> = signal(false);
 
+  public isRemovingDiscipline: WritableSignal<boolean> = signal(false);
+
   public labworkDetails: WritableSignal<Labwork | null> = signal(null);
 
   public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly labworkService: LabworkService) { }
@@ -112,10 +114,21 @@ export class LabworkDetails implements OnInit, OnDestroy {
   }
 
   public onRemoveDisciplineClick(): void {
+    console.log('Removing discipline from labwork');
     const labwork = this.labworkDetails();
 
     if (labwork) {
-      this.labworkService.removeDiscipline(labwork);
+      this.isRemovingDiscipline.set(true);
+      this.labworkService.removeDiscipline(labwork).subscribe({
+        next: () => {
+          console.log('Discipline removed from labwork successfully.');
+          this.isRemovingDiscipline.set(false);
+        },
+        error: (error) => {
+          console.error('Error removing discipline from labwork:', error);
+          this.isRemovingDiscipline.set(false);
+        }
+      });
     }
   }
 }

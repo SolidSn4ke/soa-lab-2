@@ -19,6 +19,8 @@ export class DisciplineDetails implements OnInit, OnDestroy {
   public disciplineDetails: WritableSignal<Discipline | null> = signal(null);
   public isLoading: WritableSignal<boolean> = signal(false);
 
+  public isMakingHardcore: WritableSignal<boolean> = signal(false);
+
   public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly disciplineService: DisciplineService) { }
 
   public ngOnInit(): void {
@@ -111,8 +113,20 @@ export class DisciplineDetails implements OnInit, OnDestroy {
 
   public onMakeHardcoreClick(): void {
     const discipline = this.disciplineDetails();
+
     if (discipline) {
-      this.disciplineService.makeHardcore(discipline.name);
+      this.isMakingHardcore.set(true);
+
+      this.disciplineService.makeHardcore(discipline.name).subscribe({
+        next: () => {
+          console.log('Discipline made hardcore successfully.');
+          this.isMakingHardcore.set(false);
+        },
+        error: (error) => {
+          console.error('Error making discipline hardcore:', error);
+          this.isMakingHardcore.set(false);
+        }
+      });
     }
   }
 }

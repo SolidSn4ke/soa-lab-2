@@ -43,7 +43,8 @@
         </div>
 
         <div class="funny-actions default-text">
-            <button class="button button--secondary funny-button" (click)="onRemoveDisciplineClick()">
+            <button class="button button--secondary funny-button" [disabled]="isRemovingDiscipline()"
+                (click)="onRemoveDisciplineClick()">
                 Remove Discipline
             </button>
         </div>

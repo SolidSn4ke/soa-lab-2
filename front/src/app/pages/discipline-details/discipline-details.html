@@ -30,7 +30,8 @@
         </div>
 
         <div class="funny-actions default-text">
-            <button class="button button--secondary funny-button" (click)="onMakeHardcoreClick()">
+            <button class="button button--secondary funny-button" [disabled]="isMakingHardcore()"
+                (click)="onMakeHardcoreClick()">
                 Make Hardcore
             </button>
         </div>
