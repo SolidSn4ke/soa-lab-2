@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:helios": "ng build --configuration production,helios --base-href /~s408941/front/browser/",
+    "build:helios": "node scripts/build-helios.mjs",
+    "deploy:helios": "node scripts/deploy-helios.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

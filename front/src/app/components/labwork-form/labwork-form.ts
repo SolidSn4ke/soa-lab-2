@@ -27,11 +27,11 @@ export class LabworkForm implements OnChanges, OnInit {
     this.form = this.formBuilder.nonNullable.group({
       name: ['', [Validators.required]],
       coordinates: this.formBuilder.group({
-        x: [0, [Validators.required]],
-        y: [0, [Validators.required]],
+        x: ['', [Validators.required]],
+        y: ['', [Validators.required]],
       }),
-      minimalPoint: [0, [Validators.required, Validators.min(1)]],
-      averagePoint: [0, [Validators.required, Validators.min(1)]],
+      minimalPoint: ['', [Validators.required, Validators.min(1)]],
+      averagePoint: ['', [Validators.required, Validators.min(1)]],
       difficulty: ['EASY', [Validators.required]],
       disciplineId: ['', [Validators.required]],
     });
@@ -55,11 +55,11 @@ export class LabworkForm implements OnChanges, OnInit {
       this.form.reset({
         name: this.labwork?.name ?? '',
         coordinates: {
-          x: this.labwork?.coordinates.x ?? 0,
-          y: this.labwork?.coordinates.y ?? 0,
+          x: this.labwork?.coordinates.x ?? '',
+          y: this.labwork?.coordinates.y ?? '',
         },
-        minimalPoint: this.labwork?.minimalPoint ?? 0,
-        averagePoint: this.labwork?.averagePoint ?? 0,
+        minimalPoint: this.labwork?.minimalPoint ?? '',
+        averagePoint: this.labwork?.averagePoint ?? '',
         difficulty: this.labwork?.difficulty ?? 'EASY',
         disciplineId: this.labwork?.discipline?.name ?? '',
       });

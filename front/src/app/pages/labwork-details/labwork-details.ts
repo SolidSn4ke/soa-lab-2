@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabworkService } from '../../services/labwork.service';
 import { Labwork } from '../../interfaces/Labwork';
 import { LabworkForm } from '../../components/labwork-form/labwork-form';
+import { Subject, timer, merge, switchMap, takeUntil, catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
   imports: [LabworkForm],
@@ -10,7 +11,15 @@ import { LabworkForm } from '../../components/labwork-form/labwork-form';
   styleUrl: './labwork-details.scss',
   templateUrl: './labwork-details.html',
 })
-export class LabworkDetails implements OnInit {
+export class LabworkDetails implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  private readonly refresh$ = new Subject<void>();
+  private readonly pollingInterval = 10_000;
+
+  public isLoading: WritableSignal<boolean> = signal(false);
+
+  public isRemovingDiscipline: WritableSignal<boolean> = signal(false);
+
   public labworkDetails: WritableSignal<Labwork | null> = signal(null);
 
   public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly labworkService: LabworkService) { }
@@ -21,21 +30,42 @@ export class LabworkDetails implements OnInit {
     if (!Number.isInteger(id) || id <= 0) {
       console.error('Invalid labwork ID:', id);
       this.router.navigate(['/not-found']);
+      return;
     }
 
-    this.loadLabworkDetails(id);
+    merge(
+      timer(0, this.pollingInterval),
+      this.refresh$
+    )
+      .pipe(
+        switchMap(() => {
+          this.isLoading.set(true);
+
+          return this.labworkService.getById(id).pipe(
+            catchError((error) => {
+              console.error('Error loading labwork details:', error);
+              return EMPTY;
+            }),
+            finalize(() => this.isLoading.set(false))
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (labwork) => {
+          this.labworkDetails.set(labwork);
+        }
+      });
   }
 
-  public loadLabworkDetails(id: number): void {
-    this.labworkService.getById(id).subscribe({
-      next: (labwork) => {
-        this.labworkDetails.set(labwork);
-      },
-      error: (error) => {
-        console.error('Error loading labwork details:', error);
-        this.router.navigate(['/not-found']);
-      }
-    });
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.refresh$.complete();
+  }
+
+  public loadLabworkDetails(): void {
+    this.refresh$.next();
   }
 
 
@@ -47,12 +77,7 @@ export class LabworkDetails implements OnInit {
 
   public onLabworkSaved(): void {
     this.closeForm();
-
-    const labwork = this.labworkDetails();
-
-    if (labwork) {
-      this.loadLabworkDetails(labwork.id);
-    }
+    this.loadLabworkDetails();
   }
 
   public onEditClick(): void {
@@ -89,10 +114,21 @@ export class LabworkDetails implements OnInit {
   }
 
   public onRemoveDisciplineClick(): void {
+    console.log('Removing discipline from labwork');
     const labwork = this.labworkDetails();
 
     if (labwork) {
-      this.labworkService.removeDiscipline(labwork);
+      this.isRemovingDiscipline.set(true);
+      this.labworkService.removeDiscipline(labwork).subscribe({
+        next: () => {
+          console.log('Discipline removed from labwork successfully.');
+          this.isRemovingDiscipline.set(false);
+        },
+        error: (error) => {
+          console.error('Error removing discipline from labwork:', error);
+          this.isRemovingDiscipline.set(false);
+        }
+      });
     }
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Labwork } from '../../interfaces/Labwork';
 import { LabworkService } from '../../services/labwork.service';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { Pagination } from '../../components/pagination/pagination';
 import { FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
-import { finalize } from 'rxjs';
+import { Subject, timer, switchMap, takeUntil, tap, finalize, merge, catchError, EMPTY } from 'rxjs';
 import { FilterField } from '../../interfaces/FilterField';
 
 @Component({
@@ -21,7 +21,7 @@ import { FilterField } from '../../interfaces/FilterField';
   styleUrl: './labworks.scss',
   templateUrl: './labworks.html',
 })
-export class Labworks implements OnInit {
+export class Labworks implements OnInit, OnDestroy {
   public labworks: Labwork[] = [];
 
   public currentPage: number = 0;
@@ -40,44 +40,76 @@ export class Labworks implements OnInit {
   public isLoading = signal(false);
 
   public readonly filterFields: FilterField[] = [
-    { value: 'id', label: 'ID' },
-    { value: 'name', label: 'Name' },
-    { value: 'difficulty', label: 'Difficulty' },
-    { value: 'minimalPoint', label: 'Minimal Point' },
-    { value: 'averagePoint', label: 'Average Point' },
-    { value: 'discipline.name', label: 'Discipline' },
+    { value: 'id', label: 'ID', type: 'number' },
+    { value: 'name', label: 'Name', type: 'string' },
+    {
+      value: 'difficulty', label: 'Difficulty', type: 'select', options: [
+        { value: 'EASY', label: 'Easy' },
+        { value: 'NORMAL', label: 'Normal' },
+        { value: 'VERY_HARD', label: 'Very Hard' },
+        { value: 'IMPOSSIBLE', label: 'Impossible' },
+        { value: 'HOPELESS', label: 'Hopeless' },
+      ]
+    },
+    { value: 'minimalPoint', label: 'Minimal Point', type: 'number' },
+    { value: 'averagePoint', label: 'Average Point', type: 'number' },
+    { value: 'creationDate', label: 'Creation Date', type: 'date' },
+    { value: 'discipline.name', label: 'Discipline', type: 'string' },
   ];
+
+  private readonly destroy$ = new Subject<void>();
+  private readonly refresh$ = new Subject<void>();
+
+  private readonly pollingInterval = 10_000;
 
   public constructor(private labworkService: LabworkService, private router: Router) { }
 
   public ngOnInit(): void {
-    this.loadLabworks();
-  }
+    merge(
+      timer(0, this.pollingInterval),
+      this.refresh$
+    )
+      .pipe(
+        switchMap(() => {
+          this.isLoading.set(true);
 
-  public loadLabworks(): void {
-    this.isLoading.set(true);
+          const sort = buildSortParams(this.sortRules);
+          const search = buildSearchParams(this.filters);
 
-    const sort = buildSortParams(this.sortRules);
-    const search = buildSearchParams(this.filters);
-
-    this.labworkService.getLabworks(this.currentPage, this.pageSize, sort, search)
-      .pipe(finalize(() => {
-        this.isLoading.set(false);
-      }))
+          return this.labworkService.getLabworks(
+            this.currentPage,
+            this.pageSize,
+            sort,
+            search
+          ).pipe(
+            catchError((error) => {
+              console.error('Ошибка загрузки:', error);
+              return EMPTY;
+            }),
+            finalize(() => this.isLoading.set(false))
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
       .subscribe({
         next: (pageInfo) => {
-          console.log("Получены данные:", pageInfo);
-
           this.labworks = pageInfo.items;
           this.currentPage = pageInfo.page;
           this.pageSize = pageInfo.size;
           this.totalPages = pageInfo.totalPages;
           this.totalElements = pageInfo.totalElements;
-        },
-        error: (error) => {
-          console.error("Ошибка загрузки:", error);
         }
       });
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.refresh$.complete();
+  }
+
+  public loadLabworks(): void {
+    this.refresh$.next();
   }
 
   public goToPage(page: number): void {
@@ -123,19 +155,15 @@ export class Labworks implements OnInit {
       rule => rule.field === field
     );
 
-    const direction = currentRule?.direction === 'asc' ? 'desc' : 'asc';
-    if (currentRule) {
-      this.sortRules.forEach(
-        rule => {
-          if (rule === currentRule) {
-            rule.direction = direction;
-          }
-        }
-      )
+    if (!currentRule) {
+      this.sortRules.push({ field, direction: 'asc' });
+    } else if (currentRule.direction === 'asc') {
+      currentRule.direction = 'desc';
     } else {
-      this.sortRules.push({ field, direction });
+      this.sortRules = this.sortRules.filter(
+        rule => rule.field !== field
+      );
     }
-
 
     this.currentPage = 0;
     this.loadLabworks();
@@ -169,12 +197,24 @@ export class Labworks implements OnInit {
   }
 
   public onRemoveByDifficultyClick(): void {
+    console.log('Selected difficulty:', this.difficulty);
+
     if (!this.difficulty) {
       this.showDifficultyError = true;
       return;
     }
 
     this.showDifficultyError = false;
-    this.labworkService.removeByDifficulty(this.difficulty);
+
+    this.labworkService.removeByDifficulty(this.difficulty)
+      .subscribe({
+        next: () => {
+          console.log('Delete successful:');
+          this.loadLabworks();
+        },
+        error: (error) => {
+          console.error("Delete error:", error);
+        }
+      });
   }
 }

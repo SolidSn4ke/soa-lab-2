@@ -5,7 +5,7 @@
         <div class="filter-list default-text">
             @for (filter of filters; track $index; let i = $index) {
             <div class="filter-item">
-                <select [(ngModel)]="filter.field">
+                <select [(ngModel)]="filter.field" (ngModelChange)="onFieldChange(filter)">
                     @for (field of fields; track field.value) {
                     <option [value]="field.value">
                         {{ field.label }}
@@ -14,14 +14,26 @@
                 </select>
 
                 <select [(ngModel)]="filter.operator">
-                    @for (operator of operators; track operator.value) {
+                    @for (operator of getOperators(filter.field); track operator.value) {
                     <option [value]="operator.value">
                         {{ operator.label }}
                     </option>
                     }
                 </select>
 
-                <input [(ngModel)]="filter.value" type="text" placeholder="Value" />
+                @if (getField(filter.field)?.type === 'select') {
+                <select [(ngModel)]="filter.value">
+                    <option value="">Select value</option>
+                    @for (option of getField(filter.field)?.options ?? []; track option.value) {
+                    <option [value]="option.value">
+                        {{ option.label }}
+                    </option>
+                    }
+                </select>
+                } @else {
+                <input [(ngModel)]="filter.value" [type]="getField(filter.field)?.type === 'number' ? 'number'
+                : getField(filter.field)?.type === 'date' ? 'date' : 'text'" placeholder="Value" />
+                }
 
                 <button type="button" class="button button--red" (click)="removeFilter(i)">
                     Remove

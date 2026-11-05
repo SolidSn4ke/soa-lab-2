@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal, signal, WritableSignal } from '@angular/core';
+import { Component, OnDestroy, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { FilterItem } from '../../interfaces/FilterItem';
 import { FormsModule } from '@angular/forms';
 import { DisciplineService } from '../../services/discipline.service';
@@ -10,7 +10,7 @@ import { Pagination } from '../../components/pagination/pagination';
 import { FilterPanel } from '../../components/filter-panel/filter-panel';
 import { getVisiblePages } from '../../utils/pagination.utils';
 import { buildSearchParams, buildSortParams } from '../../utils/query-params.utils';
-import { finalize } from 'rxjs';
+import { Subject, timer, switchMap, takeUntil, tap, finalize, merge, catchError, EMPTY } from 'rxjs';
 import { FilterField } from '../../interfaces/FilterField';
 
 @Component({
@@ -19,7 +19,7 @@ import { FilterField } from '../../interfaces/FilterField';
   styleUrl: './disciplines.scss',
   templateUrl: './disciplines.html',
 })
-export class Disciplines implements OnInit {
+export class Disciplines implements OnInit, OnDestroy {
   public disciplines: Discipline[] = [];
 
   public currentPage: number = 0;
@@ -35,27 +35,43 @@ export class Disciplines implements OnInit {
   public isLoading: WritableSignal<boolean> = signal(false);
 
   public readonly filterFields: FilterField[] = [
-    { value: 'name', label: 'Name' },
-    { value: 'labsCount', label: 'Labs Count' },
+    { value: 'name', label: 'Name', type: 'string' },
+    { value: 'labsCount', label: 'Labs Count', type: 'number' },
   ]
+
+  private readonly destroy$ = new Subject<void>();
+  private readonly refresh$ = new Subject<void>();
+
+  private readonly pollingInterval = 10_000;
 
   public constructor(private disciplineService: DisciplineService, private router: Router) { }
 
-  public ngOnInit() {
-    this.loadDisciplines();
-  }
-
-  public loadDisciplines(): void {
-    this.isLoading.set(true);
-
-    const sort = buildSortParams(this.sortRules);
-    const search = buildSearchParams(this.filters);
-
-    this.disciplineService.getDisciplines(this.currentPage, this.pageSize, sort, search)
+  public ngOnInit(): void {
+    merge(
+      timer(0, this.pollingInterval),
+      this.refresh$
+    )
       .pipe(
-        finalize(() => {
-          this.isLoading.set(false);
-        })
+        switchMap(() => {
+          this.isLoading.set(true);
+
+          const sort = buildSortParams(this.sortRules);
+          const search = buildSearchParams(this.filters);
+
+          return this.disciplineService.getDisciplines(
+            this.currentPage,
+            this.pageSize,
+            sort,
+            search
+          ).pipe(
+            catchError((error) => {
+              console.error('Ошибка загрузки:', error);
+              return EMPTY;
+            }),
+            finalize(() => this.isLoading.set(false))
+          );
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe({
         next: (pageInfo) => {
@@ -64,11 +80,18 @@ export class Disciplines implements OnInit {
           this.pageSize = pageInfo.size;
           this.totalPages = pageInfo.totalPages;
           this.totalElements = pageInfo.totalElements;
-        },
-        error: (error) => {
-          console.error(error)
         }
       });
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.refresh$.complete();
+  }
+
+  public loadDisciplines(): void {
+    this.refresh$.next();
   }
 
   public addSearch(): void {
@@ -141,19 +164,15 @@ export class Disciplines implements OnInit {
       rule => rule.field === field
     );
 
-    const direction = currentRule?.direction === 'asc' ? 'desc' : 'asc';
-    if (currentRule) {
-      this.sortRules.forEach(
-        rule => {
-          if (rule === currentRule) {
-            rule.direction = direction;
-          }
-        }
-      )
+    if (!currentRule) {
+      this.sortRules.push({ field, direction: 'asc' });
+    } else if (currentRule.direction === 'asc') {
+      currentRule.direction = 'desc';
     } else {
-      this.sortRules.push({ field, direction });
+      this.sortRules = this.sortRules.filter(
+        rule => rule.field !== field
+      );
     }
-
 
     this.currentPage = 0;
     this.loadDisciplines();
