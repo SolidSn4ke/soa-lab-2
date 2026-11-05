@@ -10,7 +10,13 @@ export function buildSortParams(sortRules: SortItem[]): string[] {
 export function buildSearchParams(filters: FilterItem[]): string[] {
     return filters
         .filter(filter => filter.value.trim() !== '')
-        .map(
-            filter => `${filter.field}${filter.operator}${filter.value.trim()}`
-        );
+        .map(filter => {
+            let value = filter.value.trim();
+
+            if (filter.field === 'creationDate') {
+                value = `${value}T00:00:00+03:00[Europe/Moscow]`;
+            }
+
+            return `${filter.field}${filter.operator}${value}`;
+        });
 }
