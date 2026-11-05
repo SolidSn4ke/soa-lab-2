@@ -37,13 +37,15 @@ public class DisciplineService {
     public PageInfo<DisciplineDto> getAll(GetResourceRequestParams params) {
         List<DisciplineEntity> page = disciplineQueryRepo.findAll(params.getSearch(), params.getSort(),
                 params.getPage(), params.getSize());
+        long totalElements = disciplineQueryRepo.count(params.getSearch());
+        long totalPages = (totalElements + params.getSize() - 1) / params.getSize();
 
         return PageInfo.<DisciplineDto>builder()
                 .items(page.stream().map(mapper::toDto).toList())
                 .page(params.getPage())
                 .size(params.getSize())
-                .totalPages(0L)
-                .totalElements(0L)
+                .totalPages(totalPages)
+                .totalElements(totalElements)
                 .build();
     }
 

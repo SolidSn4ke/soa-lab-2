@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import jakarta.data.Limit;
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -34,7 +35,7 @@ public class LabworkService {
     @Inject
     DisciplineRepository disciplineRepo;
 
-    @Inject
+    @EJB
     LabworkQueryRepository labworkQueryRepository;
 
     public PageInfo<LabworkDto> getAll(GetResourceRequestParams params) {
