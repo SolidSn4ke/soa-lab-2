@@ -17,21 +17,60 @@ export class FilterPanel {
   @Output() public filtersChange = new EventEmitter<FilterItem[]>();
   @Output() public apply = new EventEmitter<void>();
 
-  public readonly operators = [
-    { value: '>', label: 'Greater than' },
-    { value: '<', label: 'Less than' },
-    { value: '>=', label: 'Greater than or equal' },
-    { value: '<=', label: 'Less than or equal' },
-    { value: '=', label: 'Equals' },
-    { value: '~', label: 'Contains' },
-  ];
+  public readonly operators: Record<
+    FilterField['type'],
+    { value: FilterItem['operator']; label: string }[]
+  > = {
+      string: [
+        { value: '~', label: 'Contains' },
+        { value: '=', label: 'Equals' },
+      ],
+      number: [
+        { value: '>', label: 'Greater than' },
+        { value: '<', label: 'Less than' },
+        { value: '>=', label: 'Greater than or equal' },
+        { value: '<=', label: 'Less than or equal' },
+        { value: '=', label: 'Equals' },
+      ],
+      date: [
+        { value: '>', label: 'After' },
+        { value: '<', label: 'Before' },
+        { value: '>=', label: 'On or after' },
+        { value: '<=', label: 'On or before' },
+        { value: '=', label: 'Equals' },
+      ],
+      select: [
+        { value: '=', label: 'Equals' },
+      ],
+    };
+
+  public getField(field: string): FilterField | undefined {
+    return this.fields.find(f => f.value === field);
+  }
+
+  public getOperators(field: string) {
+    const type = this.getField(field)?.type ?? 'string';
+    return this.operators[type];
+  }
+
+  public onFieldChange(filter: FilterItem): void {
+    const operators = this.getOperators(filter.field);
+
+    filter.operator = operators[0]?.value ?? '=';
+    filter.value = '';
+
+    this.filtersChange.emit([...this.filters]);
+  }
 
   public addFilter(): void {
+    const field = this.fields[0]?.value ?? '';
+    const operator = this.getOperators(field)[0]?.value ?? '=';
+
     this.filtersChange.emit([
       ...this.filters,
       {
-        field: this.fields[0]?.value ?? '',
-        operator: '~',
+        field,
+        operator,
         value: '',
       },
     ]);

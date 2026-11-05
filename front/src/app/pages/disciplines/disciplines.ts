@@ -35,8 +35,8 @@ export class Disciplines implements OnInit {
   public isLoading: WritableSignal<boolean> = signal(false);
 
   public readonly filterFields: FilterField[] = [
-    { value: 'name', label: 'Name' },
-    { value: 'labsCount', label: 'Labs Count' },
+    { value: 'name', label: 'Name', type: 'string' },
+    { value: 'labsCount', label: 'Labs Count', type: 'number' },
   ]
 
   public constructor(private disciplineService: DisciplineService, private router: Router) { }

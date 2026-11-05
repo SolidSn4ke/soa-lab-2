@@ -40,13 +40,21 @@ export class Labworks implements OnInit {
   public isLoading = signal(false);
 
   public readonly filterFields: FilterField[] = [
-    { value: 'id', label: 'ID' },
-    { value: 'name', label: 'Name' },
-    { value: 'difficulty', label: 'Difficulty' },
-    { value: 'minimalPoint', label: 'Minimal Point' },
-    { value: 'averagePoint', label: 'Average Point' },
-    { value: 'creationDate', label: 'Creation Date' },
-    { value: 'discipline.name', label: 'Discipline' },
+    { value: 'id', label: 'ID', type: 'number' },
+    { value: 'name', label: 'Name', type: 'string' },
+    {
+      value: 'difficulty', label: 'Difficulty', type: 'select', options: [
+        { value: 'EASY', label: 'Easy' },
+        { value: 'NORMAL', label: 'Normal' },
+        { value: 'VERY_HARD', label: 'Very Hard' },
+        { value: 'IMPOSSIBLE', label: 'Impossible' },
+        { value: 'HOPELESS', label: 'Hopeless' },
+      ]
+    },
+    { value: 'minimalPoint', label: 'Minimal Point', type: 'number' },
+    { value: 'averagePoint', label: 'Average Point', type: 'number' },
+    { value: 'creationDate', label: 'Creation Date', type: 'date' },
+    { value: 'discipline.name', label: 'Discipline', type: 'string' },
   ];
 
   public constructor(private labworkService: LabworkService, private router: Router) { }
