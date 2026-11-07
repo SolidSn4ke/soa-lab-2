@@ -38,8 +38,6 @@ function fail(int $status, string $message): never
 writeLog('Gateway script started. Directory: ' . __DIR__);
 
 $method = $_SERVER['REQUEST_METHOD'];
-// Helios blocks PUT/PATCH/DELETE before PHP runs. The frontend sends POST
-// with this header; only the gateway restores the backend HTTP method.
 $override = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? null;
 if ($override !== null) {
     if ($method !== 'POST' || !in_array($override, ['PUT', 'PATCH', 'DELETE'], true)) {
@@ -68,8 +66,6 @@ if (
 if (preg_match('~^/(?:labworks|disciplines)(?:/|$)~', $decodedPath)) {
     $backend = LABWORK_BACKEND;
     $service = 'labwork-service';
-    // Trust the exact self-signed WildFly certificate, independently of Jetty.
-    // Update the pin if WildFly regenerates application.keystore.
     $sslContext = [
         'verify_peer' => false,
         'verify_peer_name' => false,
