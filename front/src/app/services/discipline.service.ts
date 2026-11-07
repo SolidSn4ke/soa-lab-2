@@ -149,7 +149,13 @@ export class DisciplineService {
             return of(void 0);
         }
 
-        return this.http.post<void>(`${this.barsApiUrl}/${disciplineId}/make-hardcore`, null);
+        return this.http.post<void>(
+            `${this.barsApiUrl}/${disciplineId}/make-hardcore`,
+            null,
+            {
+                headers: this.xmlHeaders,
+                responseType: 'text'
+            });
     }
 
     public getAllDisciplines(): Observable<Discipline[]> {
